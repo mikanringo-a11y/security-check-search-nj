@@ -1,6 +1,6 @@
 "use client";
 
-import {uploadFile} from "./UploadFile"
+import { uploadFile } from "./UploadFile";
 
 export function UploadForm(){
     return(

@@ -1,9 +1,13 @@
 import { Storage } from "@google-cloud/storage";
-
-const projectId = process.env.GCP_PROJECT_ID;
-const clientEmail = process.env.GCP_CLIENT_EMAIL;
-
-const privateKey = process.env.GCP_PRIVATE_KEY;
+const base64Credentials = process.env.GCP_CREDENTIALS_BASE64;
+if (!base64Credentials) {
+    throw new Error("GCP_CREDENTIALS_BASE64 が設定されていません");
+}
+const decodedString = Buffer.from(base64Credentials, 'base64').toString('utf-8');
+const credentials = JSON.parse(decodedString);
+const projectId = credentials.project_id;
+const clientEmail = credentials.client_email;
+const privateKey = credentials.private_key;
 
 if (!projectId || !clientEmail || !privateKey) {
     throw new Error("Missing required GCP environment variables");}
@@ -16,5 +20,8 @@ export const storage = new Storage ({
     },
 })
 
-const bucketName = process.env.GCP_BUCKET_NAME || 'default-bucket-name';
+const bucketName = process.env.GCP_BUCKET_NAME;
+if (!bucketName) {
+    throw new Error("GCP_BUCKET_NAME が設定されていません");
+}
 export const bucket = storage.bucket(bucketName);
