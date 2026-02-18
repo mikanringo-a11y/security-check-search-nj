@@ -19,3 +19,43 @@
 # misc
 .DS_Store
 *.pem
+
+# Terraform
+infra/.terraform/
+*.tfstate
+*.tfstate.backup
+
+# =========================
+# Frontend (Next.js / Node)
+# =========================
+# 依存関係の本体
+frontend/node_modules/
+# Next.jsのビルドファイルとキャッシュ
+frontend/.next/
+# 環境変数ファイル
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+
+# =========================
+# Infra (Terraform)
+# =========================
+# Terraformのプロバイダーバイナリ
+infra/.terraform/
+# Terraformの現在の状態を記録したファイル（シークレットが入る可能性があるため）
+*.tfstate
+*.tfstate.backup
+
+# =========================
+# Backend (Go)
+# =========================
+# コンパイルされたバイナリファイル
+backend/server
+*.exe
+
+# =========================
+# OS / Editor
+# =========================
+.DS_Store
+.idea/
+.vscode/

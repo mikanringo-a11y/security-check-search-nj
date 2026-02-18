@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package security.v1;
+
+// Goのパッケージ名を指定 (genディレクトリ配下の構成に合わせます)
+option go_package = "github.com/asuka-sakamoto/security-system/gen/proto/security/v1;securityv1";
+service SecurityService {
+  // 疎通確認用
+  rpc Ping (PingRequest) returns (PingResponse) {}
+
+  // 将来使う予定のコントロール取得API (今は定義だけ)
+  rpc ListControls (ListControlsRequest) returns (ListControlsResponse) {}
+}
+
+message PingRequest {
+  string message = 1;
+}
+
+message PingResponse {
+  string message = 1;
+}
+
+message ListControlsRequest {}
+
+message ListControlsResponse {
+  repeated Control controls = 1;
+}
+
+message Control {
+  string id = 1;
+  string title = 2;
+}
