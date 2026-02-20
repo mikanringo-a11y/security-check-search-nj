@@ -3,10 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 
-	// "path" は不要なので削除しました
-
+	"cloud.google.com/go/pubsub/v2"
 	"connectrpc.com/connect"
 	"github.com/rs/cors"
 	"golang.org/x/net/http2"
@@ -36,11 +36,37 @@ func (s *SecurityServer) ListControls(
 	return connect.NewResponse(&securityv1.ListControlsResponse{}), nil
 }
 
+func startPubSubListener(projectID string, subID string) {
+	ctx := context.Background()
+	client, err := pubsub.NewClient(ctx, projectID)
+	if err != nil {
+		fmt.Printf("Failed to create Pub/Sub client: %v\n", err)
+		return
+	}
+	defer client.Close()
+
+	sub := client.Subscriber(subID)
+	log.Printf("Listening for messages on subscription: %s\n", subID)
+	err = sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
+		fileName := msg.Attributes["objectId"]
+		eventType := msg.Attributes["eventType"]
+		if eventType == "OBJECT_FINALIZE" {
+			log.Printf("New file uploaded: %s\n", fileName)
+			// ここでファイル処理のロジックを実装
+		} else {
+			log.Printf("Received non-finalize event: %s for file: %s\n", eventType, fileName)
+		}
+		msg.Ack()
+	})
+	if err != nil {
+		fmt.Printf("Error receiving messages: %v\n", err)
+	}
+}
 func main() {
 	mux := http.NewServeMux()
 	pathName, handler := securityv1connect.NewSecurityServiceHandler(&SecurityServer{})
 	mux.Handle(pathName, handler)
-
+	go startPubSubListener("welcome-study-sakamoto", "ingestion-subscription")
 	c := cors.New(cors.Options{
 		AllowedOrigins: []string{"http://localhost:3000"},
 		AllowedMethods: []string{"POST", "OPTIONS"},

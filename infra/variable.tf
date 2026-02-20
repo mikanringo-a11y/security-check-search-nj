@@ -9,3 +9,8 @@ variable "region" {
   default = "asia-northeast1"
 
 }
+variable "bucket_name" {
+    description = "The name of the GCS bucket to create."
+    type        = string
+    default = "welcome-study-sakamoto-bucket" 
+}
