@@ -26,7 +26,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Link href="/search" className="block p-2 rounded hover:bg-slate-800">ナレッジ検索</Link>
               <Link href="/controls" className="block p-2 rounded hover:bg-slate-800">Control 一覧</Link>
               <Link href="/unmatched" className="block p-2 rounded hover:bg-slate-800">未マッチ管理</Link>
-              <Link href="/ingest" className="block p-2 rounded hover:bg-slate-800">CSV取り込み</Link>
+              <Link href="/upload" className="block p-2 rounded hover:bg-slate-800">CSV取り込み</Link>
               <Link href="/feed" className="block p-2 rounded hover:bg-slate-800">変更フィード</Link>
             </nav>
           </aside>
