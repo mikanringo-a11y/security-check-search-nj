@@ -1,58 +1,23 @@
 import Link from "next/link";
+type Control = {
+  id: string;
+  title: string;
+  category: string;
+  tags: string[];
+  version: string;
+  updatedAt: string;
+  author: string;
+  status: string;
+};
+export default async function ControlsPage() {
+    const res = await fetch("http://localhost:3000/api/controls", { cache: 'no-store' });
+    const data = await res.json();
+    const controls: Control[] = data.controls;
 
-export default function ControlsPage() {
-    const controls = [
-        {
-      id: 'BASE-0001',
-      title: '多要素認証の実施',
-      category: 'Access Control',
-      tags: ['MFA', '認証', '2FA'],
-      version: 'v5',
-      updatedAt: '2025-03-06',
-      author: '山田',
-      status: 'active'
-    },
-    {
-      id: 'BASE-0002',
-      title: 'パスワードポリシー（複雑性・有効期限）',
-      category: 'Access Control',
-      tags: ['パスワード', 'ポリシー'],
-      version: 'v2',
-      updatedAt: '2025-02-15',
-      author: '佐藤',
-      status: 'active'
-    },
-    {
-      id: 'BASE-0128',
-      title: 'ゼロトラストアクセス制御',
-      category: 'Network Security',
-      tags: ['ゼロトラスト', 'VPN'],
-      version: 'v1',
-      updatedAt: '2025-03-01',
-      author: '鈴木',
-      status: 'active'
-    },
-    {
-      id: 'BASE-0129',
-      title: 'マルウェア対策ソフトの導入',
-      category: 'Endpoint Security',
-      tags: ['EDR', 'アンチウイルス'],
-      version: 'v3',
-      updatedAt: '2024-11-20',
-      author: '田中',
-      status: 'active'
-    },
-    {
-      id: 'BASE-0130',
-      title: '退職者のアカウント削除手順',
-      category: 'HR Security',
-      tags: ['退職', 'ID管理'],
-      version: 'v1',
-      updatedAt: '2025-03-07',
-      author: '山田',
-      status: 'draft' // 下書き状態のサンプル
-    }
-  ];
+    const formatData = (dataString: string) => {
+      const d = new Date(dataString);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    };
   return(<div className="space-y-6 max-w-7xl mx-auto">
       {/* ヘッダー部分 */}
       <div className="flex justify-between items-end border-b pb-4">
