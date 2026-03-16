@@ -1,12 +1,13 @@
 version: "2"
 sql:
   - engine: "postgresql"
+    # いま backend フォルダにいるので、ここからの相対パスにする
     queries: "db/query/"
-    schema: "db/migrations/"
+    schema: "db/migrations/*.sql"
     gen:
       go:
         package: "db"
-        out: "db"
+        out: "db" # backend/db ではなく、今いる場所からの db
         sql_package: "pgx/v5"
         emit_json_tags: true
         emit_prepared_queries: false

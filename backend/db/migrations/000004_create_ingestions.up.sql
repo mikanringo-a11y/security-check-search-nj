@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS ingestions (
+    id SERIAL PRIMARY KEY,
+    file_name VARCHAR(255) NOT NULL,
+    status VARCHAR(50) NOT NULL DEFAULT 'PROCESSING', -- PROCESSING, COMPLETED, FAILED など
+    error_message TEXT,                               -- 失敗時のエラー理由
+    created_by VARCHAR(255) NOT NULL DEFAULT 'unknown',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);

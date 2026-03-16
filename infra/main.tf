@@ -121,10 +121,13 @@ resource "google_container_cluster" "primary" {
     initial_node_count = 1
     
     deletion_protection = false
+    workload_identity_config {
+      workload_pool = "${var.project_id}.svc.id.goog"
+    }
 
 }
 resource "google_container_node_pool" "primary_nodes" {
-    name = "security-check-node-pool"
+    name = "security-check-node-pool-v2"
     location = var.region
     cluster = google_container_cluster.primary.name
     node_count = 1
@@ -134,5 +137,64 @@ resource "google_container_node_pool" "primary_nodes" {
         oauth_scopes = [
             "https://www.googleapis.com/auth/cloud-platform"
         ]
+        workload_metadata_config {
+          mode = "GKE_METADATA"
+        }
     }
+}
+# ==========================================
+# Workload Identity: フロントエンド用の権限設定
+# ==========================================
+# 1. フロントエンド用GCPサービスアカウント(GSA)の作成
+resource "google_service_account" "frontend_sa" {
+  account_id   = "frontend-sa"
+  display_name = "Frontend Service Account for GCS Upload"
+}
+
+# 2. GCSバケットへの書き込み・読み込み権限を付与
+resource "google_storage_bucket_iam_member" "frontend_gcs_admin" {
+  bucket = data.google_storage_bucket.bucket.name
+  role   = "roles/storage.objectAdmin"
+  member = "serviceAccount:${google_service_account.frontend_sa.email}"
+}
+
+# 3. KSA(Kubernetes Service Account) と GSA の紐付け
+# defaultネームスペースの「frontend-ksa」というKSAからのアクセスを許可
+resource "google_service_account_iam_member" "workload_identity_binding" {
+  service_account_id = google_service_account.frontend_sa.name
+  role               = "roles/iam.workloadIdentityUser"
+  member             = "serviceAccount:${var.project_id}.svc.id.goog[default/frontend-ksa]"
+}
+output "cloud_sql_password" {
+  value     = random_password.db_password.result
+  sensitive = true
+}
+# バックエンド用GSAの作成
+resource "google_service_account" "backend_sa" {
+  account_id   = "backend-sa"
+  display_name = "Backend Service Account for Cloud SQL"
+}
+
+# Cloud SQL接続権限を付与
+resource "google_project_iam_member" "backend_sql_client" {
+  project = var.project_id
+  role    = "roles/cloudsql.client"
+  member  = "serviceAccount:${google_service_account.backend_sa.email}"
+}
+
+# KSA (Kubernetes SA) と GSA (Google SA) の紐付け
+resource "google_service_account_iam_member" "backend_wi_binding" {
+  service_account_id = google_service_account.backend_sa.name
+  role               = "roles/iam.workloadIdentityUser"
+  member             = "serviceAccount:${var.project_id}.svc.id.goog[default/backend-ksa]"
+}
+resource "google_storage_bucket_iam_member" "frontend_storage_creator" {
+  bucket = "welcome-study-sakamoto-tfstate" # 実際のバケット名
+  role   = "roles/storage.objectCreator"
+  member = "serviceAccount:${google_service_account.frontend_sa.email}"
+}
+resource "google_storage_bucket_iam_member" "frontend_storage_viewer" {
+  bucket = "welcome-study-sakamoto-tfstate"
+  role   = "roles/storage.objectViewer"
+  member = "serviceAccount:${google_service_account.frontend_sa.email}"
 }

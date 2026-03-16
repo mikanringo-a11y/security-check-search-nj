@@ -47,21 +47,23 @@ func (q *Queries) CountRecentTeamUpdates(ctx context.Context) (int64, error) {
 
 const createControl = `-- name: CreateControl :one
 INSERT INTO controls (
-  id, title, question, answer, category, status, version
+  id, title, question, answer, category, status, version, tags, updated_by
 ) VALUES (
-  $1, $2, $3, $4, $5, $6, $7
+  $1, $2, $3, $4, $5, $6, $7, $8, $9
 )
-RETURNING id, title, category, question, answer, status, version, created_at, updated_at
+RETURNING id, title, question, answer, category, tags, version, updated_by, updated_at, status
 `
 
 type CreateControlParams struct {
-	ID       string `json:"id"`
-	Title    string `json:"title"`
-	Question string `json:"question"`
-	Answer   string `json:"answer"`
-	Category string `json:"category"`
-	Status   string `json:"status"`
-	Version  int32  `json:"version"`
+	ID        string            `json:"id"`
+	Title     string            `json:"title"`
+	Question  string            `json:"question"`
+	Answer    string            `json:"answer"`
+	Category  string            `json:"category"`
+	Status    NullControlStatus `json:"status"`
+	Version   int32             `json:"version"`
+	Tags      []string          `json:"tags"`
+	UpdatedBy string            `json:"updated_by"`
 }
 
 func (q *Queries) CreateControl(ctx context.Context, arg CreateControlParams) (Control, error) {
@@ -73,65 +75,58 @@ func (q *Queries) CreateControl(ctx context.Context, arg CreateControlParams) (C
 		arg.Category,
 		arg.Status,
 		arg.Version,
+		arg.Tags,
+		arg.UpdatedBy,
 	)
 	var i Control
 	err := row.Scan(
 		&i.ID,
 		&i.Title,
-		&i.Category,
 		&i.Question,
 		&i.Answer,
-		&i.Status,
+		&i.Category,
+		&i.Tags,
 		&i.Version,
-		&i.CreatedAt,
+		&i.UpdatedBy,
 		&i.UpdatedAt,
+		&i.Status,
 	)
 	return i, err
 }
 
 const createControlVersion = `-- name: CreateControlVersion :one
 INSERT INTO control_versions (
-    control_id, version, title, category, tags, question, answer, created_by
+    control_id, version, snapshot, diff, changed_by
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8
-) RETURNING id, control_id, version, title, category, tags, question, answer, created_by, created_at
+    $1, $2, $3, $4, $5
+) RETURNING control_id, version, snapshot, diff, changed_by, changed_at
 `
 
 type CreateControlVersionParams struct {
-	ControlID pgtype.Text `json:"control_id"`
-	Version   int32       `json:"version"`
-	Title     string      `json:"title"`
-	Category  string      `json:"category"`
-	Tags      []byte      `json:"tags"`
-	Question  string      `json:"question"`
-	Answer    string      `json:"answer"`
-	CreatedBy pgtype.Text `json:"created_by"`
+	ControlID string `json:"control_id"`
+	Version   int32  `json:"version"`
+	Snapshot  []byte `json:"snapshot"`
+	Diff      []byte `json:"diff"`
+	ChangedBy string `json:"changed_by"`
 }
 
-// 変更前のスナップショットを履歴として保存するためのクエリです
+// 変更前のスナップショットと差分をJSONで保存するためのクエリです
 func (q *Queries) CreateControlVersion(ctx context.Context, arg CreateControlVersionParams) (ControlVersion, error) {
 	row := q.db.QueryRow(ctx, createControlVersion,
 		arg.ControlID,
 		arg.Version,
-		arg.Title,
-		arg.Category,
-		arg.Tags,
-		arg.Question,
-		arg.Answer,
-		arg.CreatedBy,
+		arg.Snapshot,
+		arg.Diff,
+		arg.ChangedBy,
 	)
 	var i ControlVersion
 	err := row.Scan(
-		&i.ID,
 		&i.ControlID,
 		&i.Version,
-		&i.Title,
-		&i.Category,
-		&i.Tags,
-		&i.Question,
-		&i.Answer,
-		&i.CreatedBy,
-		&i.CreatedAt,
+		&i.Snapshot,
+		&i.Diff,
+		&i.ChangedBy,
+		&i.ChangedAt,
 	)
 	return i, err
 }
@@ -146,35 +141,11 @@ func (q *Queries) DeleteControl(ctx context.Context, id string) error {
 	return err
 }
 
-const deleteControlTags = `-- name: DeleteControlTags :exec
-DELETE FROM control_tags 
-WHERE control_id = $1
-`
-
-// 更新時に一度古いタグの紐付けを全てリセットするためのクエリです
-func (q *Queries) DeleteControlTags(ctx context.Context, controlID string) error {
-	_, err := q.db.Exec(ctx, deleteControlTags, controlID)
-	return err
-}
-
 const getControl = `-- name: GetControl :one
-
 SELECT 
-    c.id, 
-    c.title, 
-    c.category, 
-    c.question, 
-    c.answer, 
-    c.status, 
-    c.version, 
-    c.created_at, 
-    c.updated_at,
-    COALESCE(array_agg(t.name) FILTER (WHERE t.name IS NOT NULL), '{}')::varchar[] AS tags
-FROM controls c
-LEFT JOIN control_tags ct ON c.id = ct.control_id
-LEFT JOIN tags t ON ct.tag_id = t.id
-WHERE c.id = $1
-GROUP BY c.id
+    id, title, category, question, answer, status, version, tags, updated_by, updated_at
+FROM controls
+WHERE id = $1
 `
 
 type GetControlRow struct {
@@ -183,14 +154,13 @@ type GetControlRow struct {
 	Category  string             `json:"category"`
 	Question  string             `json:"question"`
 	Answer    string             `json:"answer"`
-	Status    string             `json:"status"`
+	Status    NullControlStatus  `json:"status"`
 	Version   int32              `json:"version"`
-	CreatedAt pgtype.Timestamptz `json:"created_at"`
-	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 	Tags      []string           `json:"tags"`
+	UpdatedBy string             `json:"updated_by"`
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
 
-// backend/db/query/controls.sql
 func (q *Queries) GetControl(ctx context.Context, id string) (GetControlRow, error) {
 	row := q.db.QueryRow(ctx, getControl, id)
 	var i GetControlRow
@@ -202,33 +172,32 @@ func (q *Queries) GetControl(ctx context.Context, id string) (GetControlRow, err
 		&i.Answer,
 		&i.Status,
 		&i.Version,
-		&i.CreatedAt,
-		&i.UpdatedAt,
 		&i.Tags,
+		&i.UpdatedBy,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
 
 const getControlsByIDs = `-- name: GetControlsByIDs :many
 SELECT 
-    c.id, c.title, c.category, c.question, c.answer, c.status, c.version,
-    COALESCE(array_agg(t.name) FILTER (WHERE t.name IS NOT NULL), '{}')::varchar[] AS tags
-FROM controls c
-LEFT JOIN control_tags ct ON c.id = ct.control_id
-LEFT JOIN tags t ON ct.tag_id = t.id
-WHERE c.id = ANY($1::text[])
-GROUP BY c.id
+    id, title, category, question, answer, status, version, tags, updated_by, updated_at
+FROM controls
+WHERE id = ANY($1::varchar[])
+ORDER BY updated_at DESC
 `
 
 type GetControlsByIDsRow struct {
-	ID       string   `json:"id"`
-	Title    string   `json:"title"`
-	Category string   `json:"category"`
-	Question string   `json:"question"`
-	Answer   string   `json:"answer"`
-	Status   string   `json:"status"`
-	Version  int32    `json:"version"`
-	Tags     []string `json:"tags"`
+	ID        string             `json:"id"`
+	Title     string             `json:"title"`
+	Category  string             `json:"category"`
+	Question  string             `json:"question"`
+	Answer    string             `json:"answer"`
+	Status    NullControlStatus  `json:"status"`
+	Version   int32              `json:"version"`
+	Tags      []string           `json:"tags"`
+	UpdatedBy string             `json:"updated_by"`
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
 
 func (q *Queries) GetControlsByIDs(ctx context.Context, dollar_1 []string) ([]GetControlsByIDsRow, error) {
@@ -249,6 +218,8 @@ func (q *Queries) GetControlsByIDs(ctx context.Context, dollar_1 []string) ([]Ge
 			&i.Status,
 			&i.Version,
 			&i.Tags,
+			&i.UpdatedBy,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -260,39 +231,11 @@ func (q *Queries) GetControlsByIDs(ctx context.Context, dollar_1 []string) ([]Ge
 	return items, nil
 }
 
-const linkControlTag = `-- name: LinkControlTag :exec
-INSERT INTO control_tags (control_id, tag_id) 
-VALUES ($1, $2) 
-ON CONFLICT DO NOTHING
-`
-
-type LinkControlTagParams struct {
-	ControlID string `json:"control_id"`
-	TagID     int32  `json:"tag_id"`
-}
-
-func (q *Queries) LinkControlTag(ctx context.Context, arg LinkControlTagParams) error {
-	_, err := q.db.Exec(ctx, linkControlTag, arg.ControlID, arg.TagID)
-	return err
-}
-
 const listControls = `-- name: ListControls :many
 SELECT
-    c.id,
-    c.title,
-    c.category,
-    c.question,
-    c.answer,
-    c.status,
-    c.version,
-    c.created_at,
-    c.updated_at,
-    COALESCE(array_agg(t.name) FILTER (WHERE t.name IS NOT NULL), '{}')::varchar[] AS tags
-FROM controls c
-LEFT JOIN control_tags ct ON c.id = ct.control_id
-LEFT JOIN tags t ON ct.tag_id = t.id
-GROUP BY c.id
-ORDER BY c.updated_at DESC
+    id, title, category, question, answer, status, version, tags, updated_by, updated_at
+FROM controls
+ORDER BY updated_at DESC
 `
 
 type ListControlsRow struct {
@@ -301,11 +244,11 @@ type ListControlsRow struct {
 	Category  string             `json:"category"`
 	Question  string             `json:"question"`
 	Answer    string             `json:"answer"`
-	Status    string             `json:"status"`
+	Status    NullControlStatus  `json:"status"`
 	Version   int32              `json:"version"`
-	CreatedAt pgtype.Timestamptz `json:"created_at"`
-	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 	Tags      []string           `json:"tags"`
+	UpdatedBy string             `json:"updated_by"`
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
 
 func (q *Queries) ListControls(ctx context.Context) ([]ListControlsRow, error) {
@@ -325,9 +268,9 @@ func (q *Queries) ListControls(ctx context.Context) ([]ListControlsRow, error) {
 			&i.Answer,
 			&i.Status,
 			&i.Version,
-			&i.CreatedAt,
-			&i.UpdatedAt,
 			&i.Tags,
+			&i.UpdatedBy,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -341,21 +284,9 @@ func (q *Queries) ListControls(ctx context.Context) ([]ListControlsRow, error) {
 
 const listControlsPaginated = `-- name: ListControlsPaginated :many
 SELECT
-    c.id,
-    c.title,
-    c.category,
-    c.question,
-    c.answer,
-    c.status,
-    c.version,
-    c.created_at,
-    c.updated_at,
-    COALESCE(array_agg(t.name) FILTER (WHERE t.name IS NOT NULL), '{}')::varchar[] AS tags
-FROM controls c
-LEFT JOIN control_tags ct ON c.id = ct.control_id
-LEFT JOIN tags t ON ct.tag_id = t.id
-GROUP BY c.id
-ORDER BY c.updated_at DESC
+    id, title, category, question, answer, status, version, tags, updated_by, updated_at
+FROM controls
+ORDER BY updated_at DESC
 LIMIT $1 OFFSET $2
 `
 
@@ -370,11 +301,11 @@ type ListControlsPaginatedRow struct {
 	Category  string             `json:"category"`
 	Question  string             `json:"question"`
 	Answer    string             `json:"answer"`
-	Status    string             `json:"status"`
+	Status    NullControlStatus  `json:"status"`
 	Version   int32              `json:"version"`
-	CreatedAt pgtype.Timestamptz `json:"created_at"`
-	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 	Tags      []string           `json:"tags"`
+	UpdatedBy string             `json:"updated_by"`
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
 
 func (q *Queries) ListControlsPaginated(ctx context.Context, arg ListControlsPaginatedParams) ([]ListControlsPaginatedRow, error) {
@@ -394,9 +325,9 @@ func (q *Queries) ListControlsPaginated(ctx context.Context, arg ListControlsPag
 			&i.Answer,
 			&i.Status,
 			&i.Version,
-			&i.CreatedAt,
-			&i.UpdatedAt,
 			&i.Tags,
+			&i.UpdatedBy,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -417,19 +348,23 @@ SET
     answer = $5,
     status = $6,
     version = $7,
+    tags = $8,
+    updated_by = $9,
     updated_at = CURRENT_TIMESTAMP
 WHERE id = $1
-RETURNING id, title, category, question, answer, status, version, created_at, updated_at
+RETURNING id, title, question, answer, category, tags, version, updated_by, updated_at, status
 `
 
 type UpdateControlParams struct {
-	ID       string `json:"id"`
-	Title    string `json:"title"`
-	Category string `json:"category"`
-	Question string `json:"question"`
-	Answer   string `json:"answer"`
-	Status   string `json:"status"`
-	Version  int32  `json:"version"`
+	ID        string            `json:"id"`
+	Title     string            `json:"title"`
+	Category  string            `json:"category"`
+	Question  string            `json:"question"`
+	Answer    string            `json:"answer"`
+	Status    NullControlStatus `json:"status"`
+	Version   int32             `json:"version"`
+	Tags      []string          `json:"tags"`
+	UpdatedBy string            `json:"updated_by"`
 }
 
 func (q *Queries) UpdateControl(ctx context.Context, arg UpdateControlParams) (Control, error) {
@@ -441,32 +376,21 @@ func (q *Queries) UpdateControl(ctx context.Context, arg UpdateControlParams) (C
 		arg.Answer,
 		arg.Status,
 		arg.Version,
+		arg.Tags,
+		arg.UpdatedBy,
 	)
 	var i Control
 	err := row.Scan(
 		&i.ID,
 		&i.Title,
-		&i.Category,
 		&i.Question,
 		&i.Answer,
-		&i.Status,
+		&i.Category,
+		&i.Tags,
 		&i.Version,
-		&i.CreatedAt,
+		&i.UpdatedBy,
 		&i.UpdatedAt,
+		&i.Status,
 	)
 	return i, err
-}
-
-const upsertTag = `-- name: UpsertTag :one
-INSERT INTO tags (name) 
-VALUES ($1) 
-ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name 
-RETURNING id
-`
-
-func (q *Queries) UpsertTag(ctx context.Context, name string) (int32, error) {
-	row := q.db.QueryRow(ctx, upsertTag, name)
-	var id int32
-	err := row.Scan(&id)
-	return id, err
 }

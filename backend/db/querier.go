@@ -15,27 +15,25 @@ type Querier interface {
 	CountPendingUnmatchedTasks(ctx context.Context) (int64, error)
 	CountRecentTeamUpdates(ctx context.Context) (int64, error)
 	CreateControl(ctx context.Context, arg CreateControlParams) (Control, error)
-	// 変更前のスナップショットを履歴として保存するためのクエリです
+	// 変更前のスナップショットと差分をJSONで保存するためのクエリです
 	CreateControlVersion(ctx context.Context, arg CreateControlVersionParams) (ControlVersion, error)
 	// 「誰が何を更新したか」をタイムラインに流すためのクエリです
 	CreateFeedEvent(ctx context.Context, arg CreateFeedEventParams) (FeedEvent, error)
+	CreateIngestion(ctx context.Context, arg CreateIngestionParams) (Ingestion, error)
 	// CSVから読み取った質問を保存するクエリです
 	CreateUnmatchedTask(ctx context.Context, arg CreateUnmatchedTaskParams) (UnmatchedTask, error)
 	DeleteControl(ctx context.Context, id string) error
-	// 更新時に一度古いタグの紐付けを全てリセットするためのクエリです
-	DeleteControlTags(ctx context.Context, controlID string) error
-	// backend/db/query/controls.sql
 	GetControl(ctx context.Context, id string) (GetControlRow, error)
 	GetControlsByIDs(ctx context.Context, dollar_1 []string) ([]GetControlsByIDsRow, error)
-	LinkControlTag(ctx context.Context, arg LinkControlTagParams) error
 	ListControls(ctx context.Context) ([]ListControlsRow, error)
 	ListControlsPaginated(ctx context.Context, arg ListControlsPaginatedParams) ([]ListControlsPaginatedRow, error)
 	ListFeedEvents(ctx context.Context) ([]ListFeedEventsRow, error)
+	ListIngestions(ctx context.Context) ([]Ingestion, error)
 	ListPendingUnmatchedTasks(ctx context.Context, arg ListPendingUnmatchedTasksParams) ([]UnmatchedTask, error)
 	SearchControls(ctx context.Context, dollar_1 pgtype.Text) ([]SearchControlsRow, error)
 	UpdateControl(ctx context.Context, arg UpdateControlParams) (Control, error)
+	UpdateIngestionStatus(ctx context.Context, arg UpdateIngestionStatusParams) error
 	UpdateUnmatchedTaskStatus(ctx context.Context, arg UpdateUnmatchedTaskStatusParams) error
-	UpsertTag(ctx context.Context, name string) (int32, error)
 }
 
 var _ Querier = (*Queries)(nil)

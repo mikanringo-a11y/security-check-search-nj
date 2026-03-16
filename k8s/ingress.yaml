@@ -3,6 +3,8 @@ kind: Ingress
 metadata:
   name: app-ingress
   annotations:
+    kubernetes.io/ingress.global-static-ip-name: "frontend-ip"
+    networking.gke.io/managed-certificates: "frontend-cert"
     kubernetes.io/ingress.class: "gce"
 spec:
   rules:
