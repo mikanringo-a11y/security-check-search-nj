@@ -18,8 +18,8 @@ export default function UploadPage() {
   // 履歴の取得処理
   const fetchIngestions = async () => {
     try {
-      // バックエンドのURLに合わせて変更してください
-      const res = await fetch("http://localhost:8080/api/ingestions"); 
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+      const res = await fetch(`${baseUrl}/api/ingestions`);
       if (res.ok) {
         const data = await res.json();
         setIngestions(data || []);
