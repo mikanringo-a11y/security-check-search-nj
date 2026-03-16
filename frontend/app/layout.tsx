@@ -3,6 +3,9 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import Link from 'next/link';
 import { Toaster } from 'react-hot-toast';
+import Providers from './providers';
+import AuthStatus from './AuthStatus';
+
 const inter = Inter ({subsets : ["latin"]});
 export const metadata: Metadata = {
     title: 'セキュリティナレッジ統制管理システム',
@@ -15,12 +18,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     return (
         <html lang="ja">
       <body className={`${inter.className} bg-gray-50 text-gray-900`}>
+        <Providers>
         <Toaster position="top-right" />
         <div className="flex h-screen overflow-hidden">
           {/* サイドバー */}
           <aside className="w-64 bg-slate-900 text-white flex flex-col">
             <div className="p-4 text-xl font-bold border-b border-slate-700">
-              ナレッジベース 
+              ナレッジベース
             </div>
             <nav className="flex-1 p-4 space-y-2">
               <Link href="/" className="block p-2 rounded hover:bg-slate-800">ダッシュボード</Link>
@@ -30,6 +34,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Link href="/upload" className="block p-2 rounded hover:bg-slate-800">CSV取り込み</Link>
               <Link href="/feed" className="block p-2 rounded hover:bg-slate-800">変更フィード</Link>
             </nav>
+            {/* ユーザー認証ステータス */}
+            <AuthStatus />
           </aside>
 
           {/* メインコンテンツ */}
@@ -37,6 +43,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             {children}
           </main>
         </div>
+        </Providers>
       </body>
     </html>
     );
