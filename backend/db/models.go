@@ -11,6 +11,50 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type ControlStatus string
+
+const (
+	ControlStatusDraft     ControlStatus = "draft"
+	ControlStatusActive    ControlStatus = "active"
+	ControlStatusArchived  ControlStatus = "archived"
+	ControlStatusCompleted ControlStatus = "completed"
+)
+
+func (e *ControlStatus) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = ControlStatus(s)
+	case string:
+		*e = ControlStatus(s)
+	default:
+		return fmt.Errorf("unsupported scan type for ControlStatus: %T", src)
+	}
+	return nil
+}
+
+type NullControlStatus struct {
+	ControlStatus ControlStatus `json:"control_status"`
+	Valid         bool          `json:"valid"` // Valid is true if ControlStatus is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullControlStatus) Scan(value interface{}) error {
+	if value == nil {
+		ns.ControlStatus, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.ControlStatus.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullControlStatus) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.ControlStatus), nil
+}
+
 type FeedEventType string
 
 const (
@@ -100,32 +144,23 @@ func (ns NullUnmatchedStatus) Value() (driver.Value, error) {
 type Control struct {
 	ID        string             `json:"id"`
 	Title     string             `json:"title"`
-	Category  string             `json:"category"`
 	Question  string             `json:"question"`
 	Answer    string             `json:"answer"`
-	Status    string             `json:"status"`
+	Category  string             `json:"category"`
+	Tags      []string           `json:"tags"`
 	Version   int32              `json:"version"`
-	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	UpdatedBy string             `json:"updated_by"`
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
-}
-
-type ControlTag struct {
-	ControlID string             `json:"control_id"`
-	TagID     int32              `json:"tag_id"`
-	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	Status    NullControlStatus  `json:"status"`
 }
 
 type ControlVersion struct {
-	ID        int32              `json:"id"`
-	ControlID pgtype.Text        `json:"control_id"`
+	ControlID string             `json:"control_id"`
 	Version   int32              `json:"version"`
-	Title     string             `json:"title"`
-	Category  string             `json:"category"`
-	Tags      []byte             `json:"tags"`
-	Question  string             `json:"question"`
-	Answer    string             `json:"answer"`
-	CreatedBy pgtype.Text        `json:"created_by"`
-	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	Snapshot  []byte             `json:"snapshot"`
+	Diff      []byte             `json:"diff"`
+	ChangedBy string             `json:"changed_by"`
+	ChangedAt pgtype.Timestamptz `json:"changed_at"`
 }
 
 type FeedEvent struct {
@@ -137,10 +172,14 @@ type FeedEvent struct {
 	CreatedAt   pgtype.Timestamptz `json:"created_at"`
 }
 
-type Tag struct {
-	ID        int32              `json:"id"`
-	Name      string             `json:"name"`
-	CreatedAt pgtype.Timestamptz `json:"created_at"`
+type Ingestion struct {
+	ID           int32              `json:"id"`
+	FileName     string             `json:"file_name"`
+	Status       string             `json:"status"`
+	ErrorMessage pgtype.Text        `json:"error_message"`
+	CreatedBy    string             `json:"created_by"`
+	CreatedAt    pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt    pgtype.Timestamptz `json:"updated_at"`
 }
 
 type UnmatchedTask struct {

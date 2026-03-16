@@ -12,21 +12,36 @@ import (
 )
 
 const searchControls = `-- name: SearchControls :many
-SELECT id, title, category, question, answer, status, version, created_at, updated_at FROM controls
-WHERE (title || ' ' || question || ' ' || answer) ILIKE '%' || $1 || '%'
+SELECT 
+    id, title, category, question, answer, status, version, tags, updated_by, updated_at
+FROM controls
+WHERE 
+    (title || ' ' || question || ' ' || answer) ILIKE '%' || $1 || '%'
 ORDER BY updated_at DESC
 `
 
-// 指定されたキーワード（$1）が、タイトル・質問・回答のどこかに含まれる Control を検索します
-func (q *Queries) SearchControls(ctx context.Context, dollar_1 pgtype.Text) ([]Control, error) {
+type SearchControlsRow struct {
+	ID        string             `json:"id"`
+	Title     string             `json:"title"`
+	Category  string             `json:"category"`
+	Question  string             `json:"question"`
+	Answer    string             `json:"answer"`
+	Status    NullControlStatus  `json:"status"`
+	Version   int32              `json:"version"`
+	Tags      []string           `json:"tags"`
+	UpdatedBy string             `json:"updated_by"`
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+func (q *Queries) SearchControls(ctx context.Context, dollar_1 pgtype.Text) ([]SearchControlsRow, error) {
 	rows, err := q.db.Query(ctx, searchControls, dollar_1)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Control
+	var items []SearchControlsRow
 	for rows.Next() {
-		var i Control
+		var i SearchControlsRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Title,
@@ -35,7 +50,8 @@ func (q *Queries) SearchControls(ctx context.Context, dollar_1 pgtype.Text) ([]C
 			&i.Answer,
 			&i.Status,
 			&i.Version,
-			&i.CreatedAt,
+			&i.Tags,
+			&i.UpdatedBy,
 			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
