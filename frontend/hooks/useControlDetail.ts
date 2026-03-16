@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
 import { createClient } from "@connectrpc/connect";
 import { createConnectTransport } from "@connectrpc/connect-web";
@@ -10,6 +11,7 @@ import type { Control } from "../gen/proto/security/v1/service_pb";
 
 export const useControlDetail = (controlId: string | null) => {
     const router = useRouter();
+    const { data: session } = useSession();
     const [control, setControl] = useState<Control | null>(null);
     const [isEditing, setIsEditing] = useState(false);
   // フォーム用。Protoの型に合わせるため any を許容するか、必要なプロパティだけ定義します
@@ -59,7 +61,7 @@ const handleSave = async () => {
             question: formData.question || "",
             answer: formData.answer || "",
             tags: tagInput.split(",").map(tag => tag.trim()).filter(tag => tag),
-            updatedBy: "currentUserId", // TODO: 現在のユーザーIDをセット
+            updatedBy: session?.user?.email ?? "",
         });
 
         if (res.control) {
