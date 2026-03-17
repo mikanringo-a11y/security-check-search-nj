@@ -303,3 +303,16 @@ Kubernetes manifest も責務ごとに整理します。
 - API Pod から永続化責務を外し、バッチ同期を前提にするなら **Cloud Storage + gcsfuse**
 
 現状の [`k8s/backend.yaml`](k8s/backend.yaml) は PVC 前提で単一 Pod に寄った設計なので、将来のスケール方針と更新頻度を先に決めてから保存方式を選ぶのがよいです。
+
+## 補足: フロントエンドの責務分離の参考
+フロントエンドで責務分離を説明する際は、feature 単位で構成を整理する考え方も参考になります。
+
+- `features/controls/`
+  - controls 一覧・詳細・作成に関する UI、hook、API 呼び出しを集約する
+- `lib/api/`
+  - ConnectRPC client や transport の共通化
+- `components/ui/`
+  - 汎用 UI コンポーネント
+
+参考例としては React の feature-first な構成を紹介している react-bulletproof 系の考え方が近いです。
+Next.js App Router でも、page に責務を集めすぎず、feature / ui / lib に分ける説明につなげやすいです。
