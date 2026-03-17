@@ -184,3 +184,122 @@ CSV は外部仕様なので、コード上で列の意味が明確であるこ�
 
 ### レビューコメント例
 [`processUploadedCSV()`](backend/cmd/server/main.go:557) で CSV 列を `record[2]` のように直接参照しており、仕様がコード上で見えにくいです。CSV は外部仕様なので、列の意味が名前で追える形にしたいです。ヘッダー名から列 index を解決し、必須列が無い場合は明示的にエラーにすると、仕様変更に強くなります。
+
+## 4. Terraform と Kubernetes manifest も責務ごとに分けたい
+
+### 対象
+- [`infra/main.tf`](infra/main.tf)
+- [`k8s/backend.yaml`](k8s/backend.yaml)
+- [`k8s/frontend.yaml`](k8s/frontend.yaml)
+- [`k8s/ingress.yaml`](k8s/ingress.yaml)
+- [`k8s/managed-cert.yaml`](k8s/managed-cert.yaml)
+- [`k8s/backendconfig.yaml`](k8s/backendconfig.yaml)
+- [`k8s/healthcheck.yaml`](k8s/healthcheck.yaml)
+
+### 問題
+[`infra/main.tf`](infra/main.tf) には、Pub/Sub、GCS 通知、Artifact Registry、Cloud SQL、GKE、Workload Identity、IAM が同居しています。
+
+また Kubernetes manifest も、現状はファイル単位ではある程度分かれていますが、今後リソースが増えると「アプリ」「ネットワーク」「証明書」「運用設定」の境界が見えにくくなります。
+
+### なぜ修正するのか
+インフラ定義もアプリケーションコードと同様に、変更理由ごとに分けた方が保守しやすいです。
+
+責務ごとに分かれていないと、次の問題が起きやすくなります。
+
+- 変更対象のファイルを特定しづらい
+- レビュー範囲が広がる
+- 影響調査に時間がかかる
+- 環境差分や運用設定の意図が追いにくい
+
+### どう修正するのか
+Terraform はリソース群ごとにファイルを分けます。
+
+- `infra/provider.tf`
+  - Terraform backend、provider 定義
+- `infra/pubsub.tf`
+  - Pub/Sub topic、subscription、GCS notification
+- `infra/artifact_registry.tf`
+  - Artifact Registry
+- `infra/cloudsql.tf`
+  - Cloud SQL、database、user
+- `infra/gke.tf`
+  - GKE cluster、node pool
+- `infra/iam.tf`
+  - Service Account、IAM、Workload Identity
+- `infra/output.tf`
+  - output 定義
+
+Kubernetes manifest も責務ごとに整理します。
+
+- `k8s/apps/backend/`
+  - backend の Deployment、Service、ServiceAccount
+- `k8s/apps/frontend/`
+  - frontend の Deployment、Service、ServiceAccount
+- `k8s/network/`
+  - Ingress、BackendConfig、HealthCheck
+- `k8s/security/`
+  - ManagedCertificate、Secret 関連
+
+### レビューコメント例
+[`infra/main.tf`](infra/main.tf) に複数種類のインフラリソースが集約されており、変更理由ごとの境界が見えにくいです。Terraform もアプリケーションコードと同様に責務ごとにファイル分割したいです。あわせて Kubernetes manifest もアプリ、ネットワーク、証明書の単位でディレクトリを分けると、レビューと運用がしやすくなります。
+
+### 指摘する背景
+[`k8s/backend.yaml`](k8s/backend.yaml) では、Bleve index を PVC に載せて永続化しています。
+
+- [`bleve-index-volume`](k8s/backend.yaml:25)
+- [`mountPath: /tmp/controls.bleve`](k8s/backend.yaml:33)
+- [`BLEVE_INDEX_PATH`](k8s/backend.yaml:46)
+- [`PersistentVolumeClaim`](k8s/backend.yaml:87)
+
+ここで確認したいのは、Bleve index をどのような性質のデータとして扱うかです。
+
+- DB から再生成できるキャッシュなのか
+- 失うと困る永続データに近いものなのか
+- API Pod が持つべき責務なのか
+- 別ワーカーや別コンポーネントで管理すべきものなのか
+
+特に [`accessModes: ReadWriteOnce`](k8s/backend.yaml:92) になっているため、現在の構成は単一 Pod 前提です。
+将来 replicas を増やしたい場合や、API Pod と index 管理を分離したい場合に制約になりやすいです。
+
+そのため、保存方式を選ぶ前に、更新頻度・復旧方針・スケール方針を整理したい、という背景があります。
+
+### Bleve index 永続化の選択肢
+#### 1. バッチで Cloud Storage に反映し、gcsfuse でマウントする
+**メリット**
+- Pod をまたいで同じ保存先を参照しやすい
+- index の退避先が明確になる
+- バッチ更新に寄せると API Pod の責務を軽くしやすい
+
+**デメリット**
+- オブジェクトストレージはローカルディスク前提の index と相性確認が必要
+- 更新反映が即時ではなくなりやすい
+- gcsfuse 経由の I/O 性能や整合性を検証する必要がある
+
+#### 2. NFS を使用する
+**メリット**
+- 複数 Pod から同じ index を参照しやすい
+- `ReadWriteOnce` の制約を避けやすい
+- 既存のファイルベース index の構成を大きく変えずに済む
+
+**デメリット**
+- NFS 自体の運用負荷が増える
+- レイテンシやロックの影響で検索性能が不安定になる可能性がある
+- index 更新時の同時書き込み制御を別途考える必要がある
+
+#### 3. index をコンテナイメージに含める
+**メリット**
+- 起動時の配置が単純になる
+- 配布物として version を固定しやすい
+- 読み取り専用の index なら構成が分かりやすい
+
+**デメリット**
+- index 更新のたびにイメージ再ビルドと再デプロイが必要
+- 動的更新と相性が悪い
+- index サイズが大きいと build と配布の負担が増える
+
+### 使い分けの観点
+- 更新頻度が低く、配布物として固定したいなら **コンテナイメージ同梱**
+- 複数 Pod で共有したいがファイルベース運用を維持したいなら **NFS**
+- API Pod から永続化責務を外し、バッチ同期を前提にするなら **Cloud Storage + gcsfuse**
+
+現状の [`k8s/backend.yaml`](k8s/backend.yaml) は PVC 前提で単一 Pod に寄った設計なので、将来のスケール方針と更新頻度を先に決めてから保存方式を選ぶのがよいです。
