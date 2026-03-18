@@ -19,6 +19,7 @@ COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 
 COPY . .
+ENV NEXT_PUBLIC_API_URL=https://anywhere-wwd.com
 RUN pnpm run build
 
 # ==========================================

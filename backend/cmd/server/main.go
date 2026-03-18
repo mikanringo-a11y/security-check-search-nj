@@ -13,6 +13,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	"cloud.google.com/go/pubsub/v2"
 	"cloud.google.com/go/storage"
@@ -108,12 +109,21 @@ func (s *SecurityServer) CreateControl(ctx context.Context, req *connect.Request
 
 	tx, err := s.pool.Begin(ctx)
 	if err != nil {
+		log.Printf("🚨 TX Begin Error: %v\n", err)
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to begin tx: %w", err))
 	}
 	defer tx.Rollback(ctx)
 
 	qtx := s.queries.WithTx(tx)
 
+	// 💡 修正ポイント1: Tags が nil の場合は空の配列をセットする
+	// （PostgreSQLの配列カラムにnilを直接入れようとするとエラーになるのを防ぐため）
+	tags := req.Msg.Tags
+	if tags == nil {
+		tags = []string{}
+	}
+
+	// 💡 修正ポイント2: db.CreateControlParams に tags を渡す
 	ctrl, err := qtx.CreateControl(ctx, db.CreateControlParams{
 		ID:        newID,
 		Title:     req.Msg.Title,
@@ -122,48 +132,61 @@ func (s *SecurityServer) CreateControl(ctx context.Context, req *connect.Request
 		Category:  req.Msg.Category,
 		Status:    db.NullControlStatus{ControlStatus: db.ControlStatusActive, Valid: true},
 		Version:   1,
-		Tags:      req.Msg.Tags,
-		UpdatedBy: "system",
+		Tags:      tags, // ここを nil チェック済みの tags に変更
+		UpdatedBy: "userEmail",
 	})
 	if err != nil {
+		// 🚨 修正ポイント3: 隠れていたデータベースのエラーをコンソールに出力させる
+		log.Printf("🚨 CreateControl DB Error: %v\n", err)
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to create control: %w", err))
 	}
 
 	if req.Msg.UnmatchedTaskId != "" {
 		taskIDInt, err := strconv.Atoi(req.Msg.UnmatchedTaskId)
 		if err == nil {
-			_ = qtx.UpdateUnmatchedTaskStatus(ctx, db.UpdateUnmatchedTaskStatusParams{
+			err = qtx.UpdateUnmatchedTaskStatus(ctx, db.UpdateUnmatchedTaskStatusParams{
 				ID: int32(taskIDInt),
 				Status: db.NullUnmatchedStatus{
-					UnmatchedStatus: db.UnmatchedStatus("completed"),
+					UnmatchedStatus: db.UnmatchedStatus("resolved"),
 					Valid:           true,
 				},
 			})
+			if err != nil {
+				// 🚨 念のためここにもログを追加
+				log.Printf("🚨 UpdateUnmatchedTaskStatus DB Error: %v\n", err)
+			}
+		} else {
+			log.Printf("🚨 UnmatchedTaskId Parse Error: %v\n", err)
 		}
 	}
 
 	if err := tx.Commit(ctx); err != nil {
+		log.Printf("🚨 TX Commit Error: %v\n", err)
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to commit: %w", err))
 	}
-
-	indexDoc := ControlIndexDoc{
-		Type:        "control",
-		ID:          ctrl.ID,
-		Title:       ctrl.Title,
-		Description: ctrl.Question,
-		Answer:      ctrl.Answer,
+	if s.index != nil {
+		indexDoc := ControlIndexDoc{
+			Type:        "control",
+			ID:          ctrl.ID,
+			Title:       ctrl.Title,
+			Description: ctrl.Question,
+			Answer:      ctrl.Answer,
+		}
+		if err := s.index.Index(ctrl.ID, indexDoc); err != nil {
+			log.Printf("Bleve Index Error: %v\n", err)
+		}
 	}
-	_ = s.index.Index(ctrl.ID, indexDoc)
 
+	// 💡 元のコードで途切れていた正常終了時の return を補完
+	// ※ Proto の定義に合わせてマッピング項目は微調整してください
 	return connect.NewResponse(&securityv1.CreateControlResponse{
 		Control: &securityv1.Control{
 			Id:       ctrl.ID,
 			Title:    ctrl.Title,
-			Category: ctrl.Category,
-			Tags:     req.Msg.Tags,
 			Question: ctrl.Question,
 			Answer:   ctrl.Answer,
-			Status:   string(ctrl.Status.ControlStatus),
+			Category: ctrl.Category,
+			Tags:     ctrl.Tags,
 		},
 	}), nil
 }
@@ -172,6 +195,10 @@ func (s *SecurityServer) UpdateControl(
 	ctx context.Context,
 	req *connect.Request[securityv1.UpdateControlRequest],
 ) (*connect.Response[securityv1.UpdateControlResponse], error) {
+	userEmail := req.Header().Get("X-User-Email")
+	if userEmail == "" {
+		userEmail = "system" // ヘッダーが無い場合の予備
+	}
 	tx, err := s.pool.Begin(ctx)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to begin tx: %w", err))
@@ -207,7 +234,7 @@ func (s *SecurityServer) UpdateControl(
 		Status:    oldControl.Status,
 		Version:   oldControl.Version + 1,
 		Tags:      req.Msg.Tags,
-		UpdatedBy: "system",
+		UpdatedBy: userEmail,
 	})
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to update control: %w", err))
@@ -217,12 +244,25 @@ func (s *SecurityServer) UpdateControl(
 	_, _ = qtx.CreateFeedEvent(ctx, db.CreateFeedEventParams{
 		EventType:   db.FeedEventTypeUpdated,
 		ControlID:   pgtype.Text{String: req.Msg.Id, Valid: true},
-		UserName:    "system",
+		UserName:    userEmail,
 		Description: pgtype.Text{String: description, Valid: true},
 	})
-
 	if err := tx.Commit(ctx); err != nil {
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to commit: %w", err))
+	}
+	if s.index != nil {
+		// 検索に引っ掛けてほしい項目をBleveに渡す
+		indexData := map[string]interface{}{
+			"id":       updatedControl.ID,
+			"title":    updatedControl.Title,
+			"question": updatedControl.Question,
+			"answer":   updatedControl.Answer,
+			"category": updatedControl.Category,
+			"tags":     updatedControl.Tags,
+		}
+		if err := s.index.Index(updatedControl.ID, indexData); err != nil {
+			log.Printf("Failed to update Bleve index for control %s: %v", updatedControl.ID, err)
+		}
 	}
 
 	indexDoc := ControlIndexDoc{
@@ -629,11 +669,20 @@ func main() {
 	defer pool.Close()
 	queries := db.New(pool)
 
-	index, err := initBleveIndex("controls.bleve")
+	indexPath := os.Getenv("BLEVE_INDEX_PATH")
+	if indexPath == "" {
+		indexPath = "controls.bleve"
+	}
+	index, err := initBleveIndex(indexPath)
 	if err != nil {
 		log.Fatalf("Failed to init bleve: %v", err)
 	}
-	_ = indexAllControls(queries, index)
+	log.Println("Building Bleve index from database...")
+	if err := indexAllControls(queries, index); err != nil {
+		log.Printf("Warning: failed to index all controls: %v\n", err)
+	} else {
+		log.Println(" Successfully built Bleve index!")
+	}
 
 	securityServer := &SecurityServer{
 		pool:    pool,
@@ -656,8 +705,35 @@ func main() {
 			http.Error(w, fmt.Sprintf(`{"error": "%v"}`, err), http.StatusInternalServerError)
 			return
 		}
+		type FrontendIngestion struct {
+			ID        string `json:"id"`
+			FileName  string `json:"fileName"`
+			Status    string `json:"status"`
+			CreatedBy string `json:"createdBy"`
+			CreatedAt string `json:"createdAt"`
+		}
+
+		var results []FrontendIngestion
+		for _, ing := range ingestions {
+			// 日付をフロントエンドが読める標準形式（ISO8601）に変換
+			idStr := fmt.Sprintf("%d", ing.ID)
+			createdAtStr := ""
+			if ing.CreatedAt.Valid {
+				createdAtStr = ing.CreatedAt.Time.Format(time.RFC3339)
+			}
+
+			results = append(results, FrontendIngestion{
+				ID:        idStr,
+				FileName:  ing.FileName,
+				Status:    ing.Status,
+				CreatedBy: ing.CreatedBy,
+				CreatedAt: createdAtStr,
+			})
+		}
+
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(ingestions)
+		// dbIngestions ではなく、整形した results を返す
+		json.NewEncoder(w).Encode(results)
 	})
 
 	go startPubSubListener("welcome-study-sakamoto", "ingestion-subscription", pool, index)

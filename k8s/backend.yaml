@@ -3,7 +3,6 @@ kind: ServiceAccount
 metadata:
   name: backend-ksa
   annotations:
-    # 作成した GSA のメールアドレスを指定
     iam.gke.io/gcp-service-account: backend-sa@welcome-study-sakamoto.iam.gserviceaccount.com
 ---
 apiVersion: apps/v1
@@ -25,26 +24,38 @@ spec:
         - name: bleve-index-volume
           persistentVolumeClaim:
             claimName: bleve-index-pvc
-      containers:
-        - name: backend
-          image: asia-northeast1-docker.pkg.dev/welcome-study-sakamoto/security-check-repo/backend:v5
+      initContainers:
+        - name: fix-permissions
+          image: busybox
+          command: 
+            - sh
+            - -c
+            - |
+              chown -R 65532:65532 /tmp/bleve-data
           volumeMounts:
             - name: bleve-index-volume
-              mountPath: /tmp/controls.bleve
+              mountPath: /tmp/bleve-data
+      
+      containers:
+        - name: backend
+          image: asia-northeast1-docker.pkg.dev/welcome-study-sakamoto/security-check-repo/backend:v15
+          volumeMounts:
+            - name: bleve-index-volume
+              mountPath: /tmp/bleve-data
           
           imagePullPolicy: Always
           resources:
             requests:
-              memory: "256Mi"
+              memory: "128Mi"
               cpu: "100m"
             limits:
-              memory: "512Mi"
+              memory: "256Mi"
               cpu: "200m"
           ports:
             - containerPort: 8080
           env:
             - name: BLEVE_INDEX_PATH
-              value: "/tmp/controls.bleve"
+              value: "/tmp/bleve-data/controls.bleve"
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -53,17 +64,14 @@ spec:
             - name: DATABASE_URL
               value: "postgres://postgres:$(DB_PASSWORD)@127.0.0.1:5432/security_check?sslmode=disable"
               
-
         - name: cloud-sql-proxy
           image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.11.0
-          
-          
           resources:
             requests:
               cpu: "50m"
               memory: "128Mi"
             limits:
-              memory: "256Mi"
+              memory: "128Mi"
               cpu: "100m"
           args:
           - "--port=5432"
@@ -93,7 +101,7 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 1Gi  
+      storage: 1Gi
 
 
 

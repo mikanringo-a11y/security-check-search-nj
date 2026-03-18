@@ -1,15 +1,16 @@
 "use client";
 import { useEffect, useState } from "react";
+import { UploadForm } from "./UploadForm";
 // ※ UploadFormコンポーネントのインポート等
 
 // Ingestionの型定義
 type Ingestion = {
-  ID: number;
-  FileName: string;
-  Status: string;
-  ErrorMessage: string | null;
-  CreatedBy: string;
-  CreatedAt: string;
+  id: number;
+  fileName: string;
+  status: string;
+  errorMessage: string | null;
+  createdBy: string;
+  createdAt: string;
 };
 
 export default function UploadPage() {
@@ -40,9 +41,10 @@ export default function UploadPage() {
   return (
     <div className="p-8">
       <h1 className="text-2xl font-bold mb-6">ファイルアップロード</h1>
+      <div className="max-w-xl bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <UploadForm onUploadSuccess={fetchIngestions} />
+      </div>
       
-      {/* 既存のアップロードフォーム（アップロード完了後に fetchIngestions() を呼ぶとより良いです） */}
-      {/* <UploadForm onUploadSuccess={fetchIngestions} /> */}
 
       <h2 className="text-xl font-bold mt-12 mb-4">アップロード履歴</h2>
       <div className="overflow-x-auto">
@@ -57,24 +59,24 @@ export default function UploadPage() {
           </thead>
           <tbody>
             {ingestions.map((item) => (
-              <tr key={item.ID} className="text-center">
+              <tr key={item.id} className="text-center">
                 <td className="py-2 px-4 border">
-                  {new Date(item.CreatedAt).toLocaleString()}
+                  {new Date(item.createdAt).toLocaleString()}
                 </td>
-                <td className="py-2 px-4 border">{item.FileName}</td>
+                <td className="py-2 px-4 border">{item.fileName}</td>
                 <td className="py-2 px-4 border">
                   {/* ステータスによって色を変える */}
                   <span className={`px-2 py-1 rounded text-white text-sm ${
-                    item.Status === "COMPLETED" ? "bg-green-500" :
-                    item.Status === "FAILED" ? "bg-red-500" : "bg-yellow-500"
+                    item.status === "COMPLETED" ? "bg-green-500" :
+                    item.status === "FAILED" ? "bg-red-500" : "bg-yellow-500"
                   }`}>
-                    {item.Status}
+                    {item.status}
                   </span>
-                  {item.ErrorMessage && (
-                    <p className="text-xs text-red-500 mt-1">{item.ErrorMessage}</p>
+                  {item.errorMessage && (
+                    <p className="text-xs text-red-500 mt-1">{item.errorMessage}</p>
                   )}
                 </td>
-                <td className="py-2 px-4 border">{item.CreatedBy}</td>
+                <td className="py-2 px-4 border">{item.createdBy}</td>
               </tr>
             ))}
           </tbody>
