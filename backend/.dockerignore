@@ -1,0 +1,8 @@
+# .dockerignore
+.git
+.github
+*.bleve
+*.db
+backend/controls.bleve
+frontend/node_modules
+frontend/.next

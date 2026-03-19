@@ -109,21 +109,18 @@ func (s *SecurityServer) CreateControl(ctx context.Context, req *connect.Request
 
 	tx, err := s.pool.Begin(ctx)
 	if err != nil {
-		log.Printf("🚨 TX Begin Error: %v\n", err)
+		log.Printf(" TX Begin Error: %v\n", err)
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to begin tx: %w", err))
 	}
 	defer tx.Rollback(ctx)
 
 	qtx := s.queries.WithTx(tx)
 
-	// 💡 修正ポイント1: Tags が nil の場合は空の配列をセットする
-	// （PostgreSQLの配列カラムにnilを直接入れようとするとエラーになるのを防ぐため）
 	tags := req.Msg.Tags
 	if tags == nil {
 		tags = []string{}
 	}
 
-	// 💡 修正ポイント2: db.CreateControlParams に tags を渡す
 	ctrl, err := qtx.CreateControl(ctx, db.CreateControlParams{
 		ID:        newID,
 		Title:     req.Msg.Title,
@@ -136,8 +133,8 @@ func (s *SecurityServer) CreateControl(ctx context.Context, req *connect.Request
 		UpdatedBy: "userEmail",
 	})
 	if err != nil {
-		// 🚨 修正ポイント3: 隠れていたデータベースのエラーをコンソールに出力させる
-		log.Printf("🚨 CreateControl DB Error: %v\n", err)
+
+		log.Printf("CreateControl DB Error: %v\n", err)
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to create control: %w", err))
 	}
 
@@ -152,16 +149,16 @@ func (s *SecurityServer) CreateControl(ctx context.Context, req *connect.Request
 				},
 			})
 			if err != nil {
-				// 🚨 念のためここにもログを追加
-				log.Printf("🚨 UpdateUnmatchedTaskStatus DB Error: %v\n", err)
+				//  念のためここにもログを追加
+				log.Printf(" UpdateUnmatchedTaskStatus DB Error: %v\n", err)
 			}
 		} else {
-			log.Printf("🚨 UnmatchedTaskId Parse Error: %v\n", err)
+			log.Printf(" UnmatchedTaskId Parse Error: %v\n", err)
 		}
 	}
 
 	if err := tx.Commit(ctx); err != nil {
-		log.Printf("🚨 TX Commit Error: %v\n", err)
+		log.Printf(" TX Commit Error: %v\n", err)
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to commit: %w", err))
 	}
 	if s.index != nil {
@@ -219,7 +216,7 @@ func (s *SecurityServer) UpdateControl(
 		Version:   oldControl.Version,
 		Snapshot:  snapshotBytes,
 		Diff:      []byte("{}"),
-		ChangedBy: "system",
+		ChangedBy: userEmail,
 	})
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to save version history: %w", err))
@@ -287,7 +284,97 @@ func (s *SecurityServer) UpdateControl(
 		},
 	}), nil
 }
+func (s *SecurityServer) BulkCreateControls(
+	ctx context.Context,
+	req *connect.Request[securityv1.BulkCreateControlsRequest],
+) (*connect.Response[securityv1.BulkCreateControlsResponse], error) {
 
+	items := req.Msg.Items
+	if len(items) == 0 {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("items are empty"))
+	}
+
+	// トランザクションの開始
+	tx, err := s.pool.Begin(ctx)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to begin tx: %w", err))
+	}
+	defer tx.Rollback(ctx)
+	qtx := s.queries.WithTx(tx)
+
+	// Bleveインデックス用バッチの作成
+	var batch *bleve.Batch
+	if s.index != nil {
+		batch = s.index.NewBatch()
+	}
+
+	successCount := 0
+	var errorMessages []string
+
+	// 受け取ったアイテムをループしてDBへ登録
+	for i, item := range items {
+		newID := uuid.New().String()
+		tags := item.Tags
+		if tags == nil {
+			tags = []string{}
+		}
+
+		ctrl, err := qtx.CreateControl(ctx, db.CreateControlParams{
+			ID:        newID,
+			Title:     item.Title,
+			Question:  item.Question,
+			Answer:    item.Answer,
+			Category:  item.Category,
+			Status:    db.NullControlStatus{ControlStatus: db.ControlStatusActive, Valid: true},
+			Version:   1,
+			Tags:      tags,
+			UpdatedBy: "system_bulk_import", // 認証機能があればユーザーIDを入れる
+		})
+
+		if err != nil {
+			errMsg := fmt.Sprintf("行 %d (%s) の保存に失敗: %v", i+1, item.Title, err)
+			log.Println(" BulkCreate Error:", errMsg)
+			errorMessages = append(errorMessages, errMsg)
+			continue
+		}
+
+		// 成功した場合は検索インデックスのバッチに追加
+		if batch != nil {
+			indexDoc := ControlIndexDoc{
+				Type:        "control",
+				ID:          ctrl.ID,
+				Title:       ctrl.Title,
+				Description: ctrl.Question,
+				Answer:      ctrl.Answer,
+			}
+			batch.Index(ctrl.ID, indexDoc)
+		}
+		successCount++
+	}
+
+	// 1件も成功しなかった場合はエラーとして扱う（任意）
+	if successCount == 0 {
+		return nil, connect.NewError(connect.CodeInternal, errors.New("all items failed to import"))
+	}
+
+	// トランザクションのコミット
+	if err := tx.Commit(ctx); err != nil {
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to commit tx: %w", err))
+	}
+
+	// Bleveへの一括反映
+	if batch != nil {
+		if err := s.index.Batch(batch); err != nil {
+			log.Printf(" Bleve Batch Index Error: %v\n", err)
+		}
+	}
+
+	return connect.NewResponse(&securityv1.BulkCreateControlsResponse{
+		SuccessCount:  int32(successCount),
+		ErrorCount:    int32(len(items) - successCount),
+		ErrorMessages: errorMessages,
+	}), nil
+}
 func (s *SecurityServer) ListControls(
 	ctx context.Context,
 	req *connect.Request[securityv1.ListControlsRequest],

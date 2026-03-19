@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { createClient } from "@connectrpc/connect";
 import { createConnectTransport } from "@connectrpc/connect-web";
 import { SecurityService } from "../gen/proto/security/v1/service_pb";
+import { useSession } from "next-auth/react";
 
 type CreateControlForm = {
   title: string;
@@ -16,6 +17,7 @@ type CreateControlForm = {
 export const useCreateControl = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { data: session } = useSession();
 
   const [form, setForm] = useState<CreateControlForm>({
     title: '',
@@ -58,6 +60,9 @@ export const useCreateControl = () => {
       .split(',')
       .map((tag) => tag.trim())
       .filter((tag) => tag !== '');
+      
+    // メアドを取得（取得できなければ 'unknown' にする）
+    const userEmail = session?.user?.email || "unknown";
 
     try {
       // Connect RPC クライアントの初期化
@@ -67,15 +72,23 @@ export const useCreateControl = () => {
       const client = createClient(SecurityService, transport);
 
       // 直接バックエンドの createControl を呼び出す
-      await client.createControl({
-        title: form.title,
-        category: form.category,
-        tags: tagsArray,
-        question: form.question,
-        answer: form.answer,
-        // Protocol Buffersのstring型はnullを許容しないことが多いので、空文字を渡します
-        unmatchedTaskId: taskId || "", 
-      });
+      await client.createControl(
+        {
+          title: form.title,
+          category: form.category,
+          tags: tagsArray,
+          question: form.question,
+          answer: form.answer,
+          // Protocol Buffersのstring型はnullを許容しないことが多いので、空文字を渡します
+          unmatchedTaskId: taskId || "", 
+        },
+        // 👇 第2引数でヘッダー（メールアドレス）を渡す
+        {
+          headers: {
+            "X-User-Email": userEmail,
+          },
+        }
+      );
 
       toast.success('新しいControlを作成しました！');
       router.push('/controls');

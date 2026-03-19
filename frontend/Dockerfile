@@ -16,11 +16,15 @@ ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 # ----------------
 
 COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
+#pnpmのストアをキャッシュマウント
+RUN --mount=type=cache,target=/root/.local/share/pnpm/store/v3 \
+    pnpm install --frozen-lockfile
 
 COPY . .
 ENV NEXT_PUBLIC_API_URL=https://anywhere-wwd.com
-RUN pnpm run build
+RUN --mount=type=cache,target=/app/.next/cache \
+    pnpm run build
+
 
 # ==========================================
 # 3. 実行用ステージ（本番用・極小サイズ）

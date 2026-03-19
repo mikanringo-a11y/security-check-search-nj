@@ -1398,6 +1398,186 @@ func (x *GetDashboardStatsResponse) GetTeamUpdates() int32 {
 	return 0
 }
 
+type BulkCreateControlItem struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Title         string                 `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
+	Category      string                 `protobuf:"bytes,2,opt,name=category,proto3" json:"category,omitempty"`
+	Question      string                 `protobuf:"bytes,3,opt,name=question,proto3" json:"question,omitempty"`
+	Answer        string                 `protobuf:"bytes,4,opt,name=answer,proto3" json:"answer,omitempty"`
+	Tags          []string               `protobuf:"bytes,5,rep,name=tags,proto3" json:"tags,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BulkCreateControlItem) Reset() {
+	*x = BulkCreateControlItem{}
+	mi := &file_proto_security_v1_service_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BulkCreateControlItem) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BulkCreateControlItem) ProtoMessage() {}
+
+func (x *BulkCreateControlItem) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_security_v1_service_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BulkCreateControlItem.ProtoReflect.Descriptor instead.
+func (*BulkCreateControlItem) Descriptor() ([]byte, []int) {
+	return file_proto_security_v1_service_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *BulkCreateControlItem) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *BulkCreateControlItem) GetCategory() string {
+	if x != nil {
+		return x.Category
+	}
+	return ""
+}
+
+func (x *BulkCreateControlItem) GetQuestion() string {
+	if x != nil {
+		return x.Question
+	}
+	return ""
+}
+
+func (x *BulkCreateControlItem) GetAnswer() string {
+	if x != nil {
+		return x.Answer
+	}
+	return ""
+}
+
+func (x *BulkCreateControlItem) GetTags() []string {
+	if x != nil {
+		return x.Tags
+	}
+	return nil
+}
+
+type BulkCreateControlsRequest struct {
+	state         protoimpl.MessageState   `protogen:"open.v1"`
+	Items         []*BulkCreateControlItem `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BulkCreateControlsRequest) Reset() {
+	*x = BulkCreateControlsRequest{}
+	mi := &file_proto_security_v1_service_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BulkCreateControlsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BulkCreateControlsRequest) ProtoMessage() {}
+
+func (x *BulkCreateControlsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_security_v1_service_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BulkCreateControlsRequest.ProtoReflect.Descriptor instead.
+func (*BulkCreateControlsRequest) Descriptor() ([]byte, []int) {
+	return file_proto_security_v1_service_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *BulkCreateControlsRequest) GetItems() []*BulkCreateControlItem {
+	if x != nil {
+		return x.Items
+	}
+	return nil
+}
+
+type BulkCreateControlsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SuccessCount  int32                  `protobuf:"varint,1,opt,name=success_count,json=successCount,proto3" json:"success_count,omitempty"`
+	ErrorCount    int32                  `protobuf:"varint,2,opt,name=error_count,json=errorCount,proto3" json:"error_count,omitempty"`
+	ErrorMessages []string               `protobuf:"bytes,3,rep,name=error_messages,json=errorMessages,proto3" json:"error_messages,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BulkCreateControlsResponse) Reset() {
+	*x = BulkCreateControlsResponse{}
+	mi := &file_proto_security_v1_service_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BulkCreateControlsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BulkCreateControlsResponse) ProtoMessage() {}
+
+func (x *BulkCreateControlsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_security_v1_service_proto_msgTypes[26]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BulkCreateControlsResponse.ProtoReflect.Descriptor instead.
+func (*BulkCreateControlsResponse) Descriptor() ([]byte, []int) {
+	return file_proto_security_v1_service_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *BulkCreateControlsResponse) GetSuccessCount() int32 {
+	if x != nil {
+		return x.SuccessCount
+	}
+	return 0
+}
+
+func (x *BulkCreateControlsResponse) GetErrorCount() int32 {
+	if x != nil {
+		return x.ErrorCount
+	}
+	return 0
+}
+
+func (x *BulkCreateControlsResponse) GetErrorMessages() []string {
+	if x != nil {
+		return x.ErrorMessages
+	}
+	return nil
+}
+
 var File_proto_security_v1_service_proto protoreflect.FileDescriptor
 
 const file_proto_security_v1_service_proto_rawDesc = "" +
@@ -1504,7 +1684,20 @@ const file_proto_security_v1_service_proto_rawDesc = "" +
 	"\x19GetDashboardStatsResponse\x12%\n" +
 	"\x0etotal_controls\x18\x01 \x01(\x05R\rtotalControls\x12+\n" +
 	"\x11pending_unmatched\x18\x02 \x01(\x05R\x10pendingUnmatched\x12!\n" +
-	"\fteam_updates\x18\x03 \x01(\x05R\vteamUpdates2\x8d\a\n" +
+	"\fteam_updates\x18\x03 \x01(\x05R\vteamUpdates\"\x91\x01\n" +
+	"\x15BulkCreateControlItem\x12\x14\n" +
+	"\x05title\x18\x01 \x01(\tR\x05title\x12\x1a\n" +
+	"\bcategory\x18\x02 \x01(\tR\bcategory\x12\x1a\n" +
+	"\bquestion\x18\x03 \x01(\tR\bquestion\x12\x16\n" +
+	"\x06answer\x18\x04 \x01(\tR\x06answer\x12\x12\n" +
+	"\x04tags\x18\x05 \x03(\tR\x04tags\"U\n" +
+	"\x19BulkCreateControlsRequest\x128\n" +
+	"\x05items\x18\x01 \x03(\v2\".security.v1.BulkCreateControlItemR\x05items\"\x89\x01\n" +
+	"\x1aBulkCreateControlsResponse\x12#\n" +
+	"\rsuccess_count\x18\x01 \x01(\x05R\fsuccessCount\x12\x1f\n" +
+	"\verror_count\x18\x02 \x01(\x05R\n" +
+	"errorCount\x12%\n" +
+	"\x0eerror_messages\x18\x03 \x03(\tR\rerrorMessages2\xf6\a\n" +
 	"\x0fSecurityService\x12=\n" +
 	"\x04Ping\x12\x18.security.v1.PingRequest\x1a\x19.security.v1.PingResponse\"\x00\x12U\n" +
 	"\fListControls\x12 .security.v1.ListControlsRequest\x1a!.security.v1.ListControlsResponse\"\x00\x12O\n" +
@@ -1516,7 +1709,8 @@ const file_proto_security_v1_service_proto_rawDesc = "" +
 	"\x11GetDashboardStats\x12%.security.v1.GetDashboardStatsRequest\x1a&.security.v1.GetDashboardStatsResponse\x12[\n" +
 	"\x0eSearchControls\x12\".security.v1.SearchControlsRequest\x1a#.security.v1.SearchControlsResponse\"\x00\x12g\n" +
 	"\x12ListUnmatchedTasks\x12&.security.v1.ListUnmatchedTasksRequest\x1a'.security.v1.ListUnmatchedTasksResponse\"\x00\x12[\n" +
-	"\x0eListFeedEvents\x12\".security.v1.ListFeedEventsRequest\x1a#.security.v1.ListFeedEventsResponse\"\x00BLZJgithub.com/asuka-sakamoto/security-system/gen/proto/security/v1;securityv1b\x06proto3"
+	"\x0eListFeedEvents\x12\".security.v1.ListFeedEventsRequest\x1a#.security.v1.ListFeedEventsResponse\"\x00\x12g\n" +
+	"\x12BulkCreateControls\x12&.security.v1.BulkCreateControlsRequest\x1a'.security.v1.BulkCreateControlsResponse\"\x00BLZJgithub.com/asuka-sakamoto/security-system/gen/proto/security/v1;securityv1b\x06proto3"
 
 var (
 	file_proto_security_v1_service_proto_rawDescOnce sync.Once
@@ -1530,7 +1724,7 @@ func file_proto_security_v1_service_proto_rawDescGZIP() []byte {
 	return file_proto_security_v1_service_proto_rawDescData
 }
 
-var file_proto_security_v1_service_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
+var file_proto_security_v1_service_proto_msgTypes = make([]protoimpl.MessageInfo, 27)
 var file_proto_security_v1_service_proto_goTypes = []any{
 	(*Control)(nil),                    // 0: security.v1.Control
 	(*ControlVersion)(nil),             // 1: security.v1.ControlVersion
@@ -1556,13 +1750,16 @@ var file_proto_security_v1_service_proto_goTypes = []any{
 	(*DeleteControlResponse)(nil),      // 21: security.v1.DeleteControlResponse
 	(*GetDashboardStatsRequest)(nil),   // 22: security.v1.GetDashboardStatsRequest
 	(*GetDashboardStatsResponse)(nil),  // 23: security.v1.GetDashboardStatsResponse
-	(*timestamppb.Timestamp)(nil),      // 24: google.protobuf.Timestamp
+	(*BulkCreateControlItem)(nil),      // 24: security.v1.BulkCreateControlItem
+	(*BulkCreateControlsRequest)(nil),  // 25: security.v1.BulkCreateControlsRequest
+	(*BulkCreateControlsResponse)(nil), // 26: security.v1.BulkCreateControlsResponse
+	(*timestamppb.Timestamp)(nil),      // 27: google.protobuf.Timestamp
 }
 var file_proto_security_v1_service_proto_depIdxs = []int32{
-	24, // 0: security.v1.Control.updated_at:type_name -> google.protobuf.Timestamp
-	24, // 1: security.v1.ControlVersion.changed_at:type_name -> google.protobuf.Timestamp
-	24, // 2: security.v1.UnmatchedTask.created_at:type_name -> google.protobuf.Timestamp
-	24, // 3: security.v1.FeedEvent.created_at:type_name -> google.protobuf.Timestamp
+	27, // 0: security.v1.Control.updated_at:type_name -> google.protobuf.Timestamp
+	27, // 1: security.v1.ControlVersion.changed_at:type_name -> google.protobuf.Timestamp
+	27, // 2: security.v1.UnmatchedTask.created_at:type_name -> google.protobuf.Timestamp
+	27, // 3: security.v1.FeedEvent.created_at:type_name -> google.protobuf.Timestamp
 	0,  // 4: security.v1.ListControlsResponse.controls:type_name -> security.v1.Control
 	0,  // 5: security.v1.GetControlResponse.control:type_name -> security.v1.Control
 	1,  // 6: security.v1.GetControlResponse.history:type_name -> security.v1.ControlVersion
@@ -1571,31 +1768,34 @@ var file_proto_security_v1_service_proto_depIdxs = []int32{
 	0,  // 9: security.v1.UpdateControlResponse.control:type_name -> security.v1.Control
 	2,  // 10: security.v1.ListUnmatchedTasksResponse.tasks:type_name -> security.v1.UnmatchedTask
 	3,  // 11: security.v1.ListFeedEventsResponse.events:type_name -> security.v1.FeedEvent
-	4,  // 12: security.v1.SecurityService.Ping:input_type -> security.v1.PingRequest
-	6,  // 13: security.v1.SecurityService.ListControls:input_type -> security.v1.ListControlsRequest
-	8,  // 14: security.v1.SecurityService.GetControl:input_type -> security.v1.GetControlRequest
-	10, // 15: security.v1.SecurityService.CreateControl:input_type -> security.v1.CreateControlRequest
-	14, // 16: security.v1.SecurityService.UpdateControl:input_type -> security.v1.UpdateControlRequest
-	20, // 17: security.v1.SecurityService.DeleteControl:input_type -> security.v1.DeleteControlRequest
-	22, // 18: security.v1.SecurityService.GetDashboardStats:input_type -> security.v1.GetDashboardStatsRequest
-	12, // 19: security.v1.SecurityService.SearchControls:input_type -> security.v1.SearchControlsRequest
-	16, // 20: security.v1.SecurityService.ListUnmatchedTasks:input_type -> security.v1.ListUnmatchedTasksRequest
-	18, // 21: security.v1.SecurityService.ListFeedEvents:input_type -> security.v1.ListFeedEventsRequest
-	5,  // 22: security.v1.SecurityService.Ping:output_type -> security.v1.PingResponse
-	7,  // 23: security.v1.SecurityService.ListControls:output_type -> security.v1.ListControlsResponse
-	9,  // 24: security.v1.SecurityService.GetControl:output_type -> security.v1.GetControlResponse
-	11, // 25: security.v1.SecurityService.CreateControl:output_type -> security.v1.CreateControlResponse
-	15, // 26: security.v1.SecurityService.UpdateControl:output_type -> security.v1.UpdateControlResponse
-	21, // 27: security.v1.SecurityService.DeleteControl:output_type -> security.v1.DeleteControlResponse
-	23, // 28: security.v1.SecurityService.GetDashboardStats:output_type -> security.v1.GetDashboardStatsResponse
-	13, // 29: security.v1.SecurityService.SearchControls:output_type -> security.v1.SearchControlsResponse
-	17, // 30: security.v1.SecurityService.ListUnmatchedTasks:output_type -> security.v1.ListUnmatchedTasksResponse
-	19, // 31: security.v1.SecurityService.ListFeedEvents:output_type -> security.v1.ListFeedEventsResponse
-	22, // [22:32] is the sub-list for method output_type
-	12, // [12:22] is the sub-list for method input_type
-	12, // [12:12] is the sub-list for extension type_name
-	12, // [12:12] is the sub-list for extension extendee
-	0,  // [0:12] is the sub-list for field type_name
+	24, // 12: security.v1.BulkCreateControlsRequest.items:type_name -> security.v1.BulkCreateControlItem
+	4,  // 13: security.v1.SecurityService.Ping:input_type -> security.v1.PingRequest
+	6,  // 14: security.v1.SecurityService.ListControls:input_type -> security.v1.ListControlsRequest
+	8,  // 15: security.v1.SecurityService.GetControl:input_type -> security.v1.GetControlRequest
+	10, // 16: security.v1.SecurityService.CreateControl:input_type -> security.v1.CreateControlRequest
+	14, // 17: security.v1.SecurityService.UpdateControl:input_type -> security.v1.UpdateControlRequest
+	20, // 18: security.v1.SecurityService.DeleteControl:input_type -> security.v1.DeleteControlRequest
+	22, // 19: security.v1.SecurityService.GetDashboardStats:input_type -> security.v1.GetDashboardStatsRequest
+	12, // 20: security.v1.SecurityService.SearchControls:input_type -> security.v1.SearchControlsRequest
+	16, // 21: security.v1.SecurityService.ListUnmatchedTasks:input_type -> security.v1.ListUnmatchedTasksRequest
+	18, // 22: security.v1.SecurityService.ListFeedEvents:input_type -> security.v1.ListFeedEventsRequest
+	25, // 23: security.v1.SecurityService.BulkCreateControls:input_type -> security.v1.BulkCreateControlsRequest
+	5,  // 24: security.v1.SecurityService.Ping:output_type -> security.v1.PingResponse
+	7,  // 25: security.v1.SecurityService.ListControls:output_type -> security.v1.ListControlsResponse
+	9,  // 26: security.v1.SecurityService.GetControl:output_type -> security.v1.GetControlResponse
+	11, // 27: security.v1.SecurityService.CreateControl:output_type -> security.v1.CreateControlResponse
+	15, // 28: security.v1.SecurityService.UpdateControl:output_type -> security.v1.UpdateControlResponse
+	21, // 29: security.v1.SecurityService.DeleteControl:output_type -> security.v1.DeleteControlResponse
+	23, // 30: security.v1.SecurityService.GetDashboardStats:output_type -> security.v1.GetDashboardStatsResponse
+	13, // 31: security.v1.SecurityService.SearchControls:output_type -> security.v1.SearchControlsResponse
+	17, // 32: security.v1.SecurityService.ListUnmatchedTasks:output_type -> security.v1.ListUnmatchedTasksResponse
+	19, // 33: security.v1.SecurityService.ListFeedEvents:output_type -> security.v1.ListFeedEventsResponse
+	26, // 34: security.v1.SecurityService.BulkCreateControls:output_type -> security.v1.BulkCreateControlsResponse
+	24, // [24:35] is the sub-list for method output_type
+	13, // [13:24] is the sub-list for method input_type
+	13, // [13:13] is the sub-list for extension type_name
+	13, // [13:13] is the sub-list for extension extendee
+	0,  // [0:13] is the sub-list for field type_name
 }
 
 func init() { file_proto_security_v1_service_proto_init() }
@@ -1609,7 +1809,7 @@ func file_proto_security_v1_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_security_v1_service_proto_rawDesc), len(file_proto_security_v1_service_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   24,
+			NumMessages:   27,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
