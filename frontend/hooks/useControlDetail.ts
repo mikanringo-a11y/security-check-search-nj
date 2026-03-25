@@ -48,6 +48,7 @@ export const useControlDetail = (controlId: string | null) => {
         fetchControlDetail();
     }, [controlId]);
 
+
     const handleSave = async () => {
         try {
             
@@ -59,6 +60,7 @@ export const useControlDetail = (controlId: string | null) => {
                 answer: formData.answer || "",
                 tags: tagInput.split(",").map(tag => tag.trim()).filter(tag => tag),
             });
+
 
             if (result.success) {
                 // 成功したら画面の表示を更新して編集モードを終了
