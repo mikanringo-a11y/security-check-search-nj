@@ -1,0 +1,34 @@
+name: Backend Go Test
+
+# backend ブランチにPushされた時、またはPull Requestが作られた時に実行
+on:
+  push:
+    branches: [ "backend" ]
+  pull_request:
+    branches: [ "backend" ]
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    
+    # 重要: Goのコードが 'backend' フォルダ内にあるため、基準ディレクトリを変更します
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.6' # go.mod のバージョンに合わせています
+          cache-dependency-path: backend/go.sum # キャッシュが正しく効くようにパスを指定
+
+      - name: Install dependencies
+        run: go mod download
+
+      - name: Run tests with pgxmock
+        run: go test -v -race ./...

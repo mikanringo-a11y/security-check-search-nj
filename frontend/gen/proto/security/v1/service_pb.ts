@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file proto/security/v1/service.proto.
  */
 export const file_proto_security_v1_service: GenFile = /*@__PURE__*/
-  fileDesc("Ch9wcm90by9zZWN1cml0eS92MS9zZXJ2aWNlLnByb3RvEgtzZWN1cml0eS52MSLLAQoHQ29udHJvbBIKCgJpZBgBIAEoCRINCgV0aXRsZRgCIAEoCRIQCghxdWVzdGlvbhgDIAEoCRIOCgZhbnN3ZXIYBCABKAkSEAoIY2F0ZWdvcnkYBSABKAkSDAoEdGFncxgGIAMoCRIPCgd2ZXJzaW9uGAcgASgJEhIKCnVwZGF0ZWRfYnkYCCABKAkSLgoKdXBkYXRlZF9hdBgJIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASDgoGc3RhdHVzGAogASgJIowBCg5Db250cm9sVmVyc2lvbhISCgpjb250cm9sX2lkGAEgASgJEg8KB3ZlcnNpb24YAiABKAUSEgoKY2hhbmdlZF9ieRgDIAEoCRIuCgpjaGFuZ2VkX2F0GAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIRCglkaWZmX2pzb24YBSABKAkiogEKDVVubWF0Y2hlZFRhc2sSCgoCaWQYASABKAUSGgoSb3JpZ2luYWxfZmlsZV9uYW1lGAIgASgJEhIKCnJvd19udW1iZXIYAyABKAUSFQoNcXVlc3Rpb25fdGV4dBgEIAEoCRIOCgZzdGF0dXMYBSABKAkSLgoKY3JlYXRlZF9hdBgGIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAirgEKCUZlZWRFdmVudBIKCgJpZBgBIAEoBRISCgpldmVudF90eXBlGAIgASgJEhIKCmNvbnRyb2xfaWQYAyABKAkSEQoJdXNlcl9uYW1lGAQgASgJEhMKC2Rlc2NyaXB0aW9uGAUgASgJEi4KCmNyZWF0ZWRfYXQYBiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEhUKDWNvbnRyb2xfdGl0bGUYByABKAkiHgoLUGluZ1JlcXVlc3QSDwoHbWVzc2FnZRgBIAEoCSIfCgxQaW5nUmVzcG9uc2USDwoHbWVzc2FnZRgBIAEoCSJcChNMaXN0Q29udHJvbHNSZXF1ZXN0Eg0KBWxpbWl0GAEgASgFEg4KBm9mZnNldBgCIAEoBRISCgpzb3J0X2ZpZWxkGAMgASgJEhIKCnNvcnRfb3JkZXIYBCABKAkiUwoUTGlzdENvbnRyb2xzUmVzcG9uc2USJgoIY29udHJvbHMYASADKAsyFC5zZWN1cml0eS52MS5Db250cm9sEhMKC3RvdGFsX2NvdW50GAIgASgFIh8KEUdldENvbnRyb2xSZXF1ZXN0EgoKAmlkGAEgASgJImkKEkdldENvbnRyb2xSZXNwb25zZRIlCgdjb250cm9sGAEgASgLMhQuc2VjdXJpdHkudjEuQ29udHJvbBIsCgdoaXN0b3J5GAIgAygLMhsuc2VjdXJpdHkudjEuQ29udHJvbFZlcnNpb24iggEKFENyZWF0ZUNvbnRyb2xSZXF1ZXN0Eg0KBXRpdGxlGAEgASgJEhAKCGNhdGVnb3J5GAIgASgJEgwKBHRhZ3MYAyADKAkSEAoIcXVlc3Rpb24YBCABKAkSDgoGYW5zd2VyGAUgASgJEhkKEXVubWF0Y2hlZF90YXNrX2lkGAYgASgJIj4KFUNyZWF0ZUNvbnRyb2xSZXNwb25zZRIlCgdjb250cm9sGAEgASgLMhQuc2VjdXJpdHkudjEuQ29udHJvbCImChVTZWFyY2hDb250cm9sc1JlcXVlc3QSDQoFcXVlcnkYASABKAkiPAoWU2VhcmNoQ29udHJvbHNSZXNwb25zZRIiCgRoaXRzGAEgAygLMhQuc2VjdXJpdHkudjEuQ29udHJvbCKHAQoUVXBkYXRlQ29udHJvbFJlcXVlc3QSCgoCaWQYASABKAkSDQoFdGl0bGUYAiABKAkSEAoIcXVlc3Rpb24YAyABKAkSDgoGYW5zd2VyGAQgASgJEhAKCGNhdGVnb3J5GAUgASgJEgwKBHRhZ3MYBiADKAkSEgoKdXBkYXRlZF9ieRgHIAEoCSI+ChVVcGRhdGVDb250cm9sUmVzcG9uc2USJQoHY29udHJvbBgBIAEoCzIULnNlY3VyaXR5LnYxLkNvbnRyb2wiGwoZTGlzdFVubWF0Y2hlZFRhc2tzUmVxdWVzdCJHChpMaXN0VW5tYXRjaGVkVGFza3NSZXNwb25zZRIpCgV0YXNrcxgBIAMoCzIaLnNlY3VyaXR5LnYxLlVubWF0Y2hlZFRhc2siFwoVTGlzdEZlZWRFdmVudHNSZXF1ZXN0IkAKFkxpc3RGZWVkRXZlbnRzUmVzcG9uc2USJgoGZXZlbnRzGAEgAygLMhYuc2VjdXJpdHkudjEuRmVlZEV2ZW50IiIKFERlbGV0ZUNvbnRyb2xSZXF1ZXN0EgoKAmlkGAEgASgJIigKFURlbGV0ZUNvbnRyb2xSZXNwb25zZRIPCgdzdWNjZXNzGAEgASgIIhoKGEdldERhc2hib2FyZFN0YXRzUmVxdWVzdCJkChlHZXREYXNoYm9hcmRTdGF0c1Jlc3BvbnNlEhYKDnRvdGFsX2NvbnRyb2xzGAEgASgFEhkKEXBlbmRpbmdfdW5tYXRjaGVkGAIgASgFEhQKDHRlYW1fdXBkYXRlcxgDIAEoBTKNBwoPU2VjdXJpdHlTZXJ2aWNlEj0KBFBpbmcSGC5zZWN1cml0eS52MS5QaW5nUmVxdWVzdBoZLnNlY3VyaXR5LnYxLlBpbmdSZXNwb25zZSIAElUKDExpc3RDb250cm9scxIgLnNlY3VyaXR5LnYxLkxpc3RDb250cm9sc1JlcXVlc3QaIS5zZWN1cml0eS52MS5MaXN0Q29udHJvbHNSZXNwb25zZSIAEk8KCkdldENvbnRyb2wSHi5zZWN1cml0eS52MS5HZXRDb250cm9sUmVxdWVzdBofLnNlY3VyaXR5LnYxLkdldENvbnRyb2xSZXNwb25zZSIAElgKDUNyZWF0ZUNvbnRyb2wSIS5zZWN1cml0eS52MS5DcmVhdGVDb250cm9sUmVxdWVzdBoiLnNlY3VyaXR5LnYxLkNyZWF0ZUNvbnRyb2xSZXNwb25zZSIAElgKDVVwZGF0ZUNvbnRyb2wSIS5zZWN1cml0eS52MS5VcGRhdGVDb250cm9sUmVxdWVzdBoiLnNlY3VyaXR5LnYxLlVwZGF0ZUNvbnRyb2xSZXNwb25zZSIAElgKDURlbGV0ZUNvbnRyb2wSIS5zZWN1cml0eS52MS5EZWxldGVDb250cm9sUmVxdWVzdBoiLnNlY3VyaXR5LnYxLkRlbGV0ZUNvbnRyb2xSZXNwb25zZSIAEmIKEUdldERhc2hib2FyZFN0YXRzEiUuc2VjdXJpdHkudjEuR2V0RGFzaGJvYXJkU3RhdHNSZXF1ZXN0GiYuc2VjdXJpdHkudjEuR2V0RGFzaGJvYXJkU3RhdHNSZXNwb25zZRJbCg5TZWFyY2hDb250cm9scxIiLnNlY3VyaXR5LnYxLlNlYXJjaENvbnRyb2xzUmVxdWVzdBojLnNlY3VyaXR5LnYxLlNlYXJjaENvbnRyb2xzUmVzcG9uc2UiABJnChJMaXN0VW5tYXRjaGVkVGFza3MSJi5zZWN1cml0eS52MS5MaXN0VW5tYXRjaGVkVGFza3NSZXF1ZXN0Gicuc2VjdXJpdHkudjEuTGlzdFVubWF0Y2hlZFRhc2tzUmVzcG9uc2UiABJbCg5MaXN0RmVlZEV2ZW50cxIiLnNlY3VyaXR5LnYxLkxpc3RGZWVkRXZlbnRzUmVxdWVzdBojLnNlY3VyaXR5LnYxLkxpc3RGZWVkRXZlbnRzUmVzcG9uc2UiAEJMWkpnaXRodWIuY29tL2FzdWthLXNha2Ftb3RvL3NlY3VyaXR5LXN5c3RlbS9nZW4vcHJvdG8vc2VjdXJpdHkvdjE7c2VjdXJpdHl2MWIGcHJvdG8z", [file_google_protobuf_timestamp]);
+  fileDesc("Ch9wcm90by9zZWN1cml0eS92MS9zZXJ2aWNlLnByb3RvEgtzZWN1cml0eS52MSLLAQoHQ29udHJvbBIKCgJpZBgBIAEoCRINCgV0aXRsZRgCIAEoCRIQCghxdWVzdGlvbhgDIAEoCRIOCgZhbnN3ZXIYBCABKAkSEAoIY2F0ZWdvcnkYBSABKAkSDAoEdGFncxgGIAMoCRIPCgd2ZXJzaW9uGAcgASgJEhIKCnVwZGF0ZWRfYnkYCCABKAkSLgoKdXBkYXRlZF9hdBgJIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASDgoGc3RhdHVzGAogASgJIowBCg5Db250cm9sVmVyc2lvbhISCgpjb250cm9sX2lkGAEgASgJEg8KB3ZlcnNpb24YAiABKAUSEgoKY2hhbmdlZF9ieRgDIAEoCRIuCgpjaGFuZ2VkX2F0GAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIRCglkaWZmX2pzb24YBSABKAkiogEKDVVubWF0Y2hlZFRhc2sSCgoCaWQYASABKAUSGgoSb3JpZ2luYWxfZmlsZV9uYW1lGAIgASgJEhIKCnJvd19udW1iZXIYAyABKAUSFQoNcXVlc3Rpb25fdGV4dBgEIAEoCRIOCgZzdGF0dXMYBSABKAkSLgoKY3JlYXRlZF9hdBgGIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAirgEKCUZlZWRFdmVudBIKCgJpZBgBIAEoBRISCgpldmVudF90eXBlGAIgASgJEhIKCmNvbnRyb2xfaWQYAyABKAkSEQoJdXNlcl9uYW1lGAQgASgJEhMKC2Rlc2NyaXB0aW9uGAUgASgJEi4KCmNyZWF0ZWRfYXQYBiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEhUKDWNvbnRyb2xfdGl0bGUYByABKAkiHgoLUGluZ1JlcXVlc3QSDwoHbWVzc2FnZRgBIAEoCSIfCgxQaW5nUmVzcG9uc2USDwoHbWVzc2FnZRgBIAEoCSJcChNMaXN0Q29udHJvbHNSZXF1ZXN0Eg0KBWxpbWl0GAEgASgFEg4KBm9mZnNldBgCIAEoBRISCgpzb3J0X2ZpZWxkGAMgASgJEhIKCnNvcnRfb3JkZXIYBCABKAkiUwoUTGlzdENvbnRyb2xzUmVzcG9uc2USJgoIY29udHJvbHMYASADKAsyFC5zZWN1cml0eS52MS5Db250cm9sEhMKC3RvdGFsX2NvdW50GAIgASgFIh8KEUdldENvbnRyb2xSZXF1ZXN0EgoKAmlkGAEgASgJImkKEkdldENvbnRyb2xSZXNwb25zZRIlCgdjb250cm9sGAEgASgLMhQuc2VjdXJpdHkudjEuQ29udHJvbBIsCgdoaXN0b3J5GAIgAygLMhsuc2VjdXJpdHkudjEuQ29udHJvbFZlcnNpb24iggEKFENyZWF0ZUNvbnRyb2xSZXF1ZXN0Eg0KBXRpdGxlGAEgASgJEhAKCGNhdGVnb3J5GAIgASgJEgwKBHRhZ3MYAyADKAkSEAoIcXVlc3Rpb24YBCABKAkSDgoGYW5zd2VyGAUgASgJEhkKEXVubWF0Y2hlZF90YXNrX2lkGAYgASgJIj4KFUNyZWF0ZUNvbnRyb2xSZXNwb25zZRIlCgdjb250cm9sGAEgASgLMhQuc2VjdXJpdHkudjEuQ29udHJvbCImChVTZWFyY2hDb250cm9sc1JlcXVlc3QSDQoFcXVlcnkYASABKAkiPAoWU2VhcmNoQ29udHJvbHNSZXNwb25zZRIiCgRoaXRzGAEgAygLMhQuc2VjdXJpdHkudjEuQ29udHJvbCKHAQoUVXBkYXRlQ29udHJvbFJlcXVlc3QSCgoCaWQYASABKAkSDQoFdGl0bGUYAiABKAkSEAoIcXVlc3Rpb24YAyABKAkSDgoGYW5zd2VyGAQgASgJEhAKCGNhdGVnb3J5GAUgASgJEgwKBHRhZ3MYBiADKAkSEgoKdXBkYXRlZF9ieRgHIAEoCSI+ChVVcGRhdGVDb250cm9sUmVzcG9uc2USJQoHY29udHJvbBgBIAEoCzIULnNlY3VyaXR5LnYxLkNvbnRyb2wiGwoZTGlzdFVubWF0Y2hlZFRhc2tzUmVxdWVzdCJHChpMaXN0VW5tYXRjaGVkVGFza3NSZXNwb25zZRIpCgV0YXNrcxgBIAMoCzIaLnNlY3VyaXR5LnYxLlVubWF0Y2hlZFRhc2siFwoVTGlzdEZlZWRFdmVudHNSZXF1ZXN0IkAKFkxpc3RGZWVkRXZlbnRzUmVzcG9uc2USJgoGZXZlbnRzGAEgAygLMhYuc2VjdXJpdHkudjEuRmVlZEV2ZW50IiIKFERlbGV0ZUNvbnRyb2xSZXF1ZXN0EgoKAmlkGAEgASgJIigKFURlbGV0ZUNvbnRyb2xSZXNwb25zZRIPCgdzdWNjZXNzGAEgASgIIhoKGEdldERhc2hib2FyZFN0YXRzUmVxdWVzdCJkChlHZXREYXNoYm9hcmRTdGF0c1Jlc3BvbnNlEhYKDnRvdGFsX2NvbnRyb2xzGAEgASgFEhkKEXBlbmRpbmdfdW5tYXRjaGVkGAIgASgFEhQKDHRlYW1fdXBkYXRlcxgDIAEoBSJoChVCdWxrQ3JlYXRlQ29udHJvbEl0ZW0SDQoFdGl0bGUYASABKAkSEAoIY2F0ZWdvcnkYAiABKAkSEAoIcXVlc3Rpb24YAyABKAkSDgoGYW5zd2VyGAQgASgJEgwKBHRhZ3MYBSADKAkiTgoZQnVsa0NyZWF0ZUNvbnRyb2xzUmVxdWVzdBIxCgVpdGVtcxgBIAMoCzIiLnNlY3VyaXR5LnYxLkJ1bGtDcmVhdGVDb250cm9sSXRlbSJgChpCdWxrQ3JlYXRlQ29udHJvbHNSZXNwb25zZRIVCg1zdWNjZXNzX2NvdW50GAEgASgFEhMKC2Vycm9yX2NvdW50GAIgASgFEhYKDmVycm9yX21lc3NhZ2VzGAMgAygJIkkKGExpbmtVbm1hdGNoZWRUYXNrUmVxdWVzdBIZChF1bm1hdGNoZWRfdGFza19pZBgBIAEoCRISCgpjb250cm9sX2lkGAIgASgJIiwKGUxpbmtVbm1hdGNoZWRUYXNrUmVzcG9uc2USDwoHc3VjY2VzcxgBIAEoCDLaCAoPU2VjdXJpdHlTZXJ2aWNlEj0KBFBpbmcSGC5zZWN1cml0eS52MS5QaW5nUmVxdWVzdBoZLnNlY3VyaXR5LnYxLlBpbmdSZXNwb25zZSIAElUKDExpc3RDb250cm9scxIgLnNlY3VyaXR5LnYxLkxpc3RDb250cm9sc1JlcXVlc3QaIS5zZWN1cml0eS52MS5MaXN0Q29udHJvbHNSZXNwb25zZSIAEk8KCkdldENvbnRyb2wSHi5zZWN1cml0eS52MS5HZXRDb250cm9sUmVxdWVzdBofLnNlY3VyaXR5LnYxLkdldENvbnRyb2xSZXNwb25zZSIAElgKDUNyZWF0ZUNvbnRyb2wSIS5zZWN1cml0eS52MS5DcmVhdGVDb250cm9sUmVxdWVzdBoiLnNlY3VyaXR5LnYxLkNyZWF0ZUNvbnRyb2xSZXNwb25zZSIAElgKDVVwZGF0ZUNvbnRyb2wSIS5zZWN1cml0eS52MS5VcGRhdGVDb250cm9sUmVxdWVzdBoiLnNlY3VyaXR5LnYxLlVwZGF0ZUNvbnRyb2xSZXNwb25zZSIAElgKDURlbGV0ZUNvbnRyb2wSIS5zZWN1cml0eS52MS5EZWxldGVDb250cm9sUmVxdWVzdBoiLnNlY3VyaXR5LnYxLkRlbGV0ZUNvbnRyb2xSZXNwb25zZSIAEmIKEUdldERhc2hib2FyZFN0YXRzEiUuc2VjdXJpdHkudjEuR2V0RGFzaGJvYXJkU3RhdHNSZXF1ZXN0GiYuc2VjdXJpdHkudjEuR2V0RGFzaGJvYXJkU3RhdHNSZXNwb25zZRJbCg5TZWFyY2hDb250cm9scxIiLnNlY3VyaXR5LnYxLlNlYXJjaENvbnRyb2xzUmVxdWVzdBojLnNlY3VyaXR5LnYxLlNlYXJjaENvbnRyb2xzUmVzcG9uc2UiABJnChJMaXN0VW5tYXRjaGVkVGFza3MSJi5zZWN1cml0eS52MS5MaXN0VW5tYXRjaGVkVGFza3NSZXF1ZXN0Gicuc2VjdXJpdHkudjEuTGlzdFVubWF0Y2hlZFRhc2tzUmVzcG9uc2UiABJbCg5MaXN0RmVlZEV2ZW50cxIiLnNlY3VyaXR5LnYxLkxpc3RGZWVkRXZlbnRzUmVxdWVzdBojLnNlY3VyaXR5LnYxLkxpc3RGZWVkRXZlbnRzUmVzcG9uc2UiABJnChJCdWxrQ3JlYXRlQ29udHJvbHMSJi5zZWN1cml0eS52MS5CdWxrQ3JlYXRlQ29udHJvbHNSZXF1ZXN0Gicuc2VjdXJpdHkudjEuQnVsa0NyZWF0ZUNvbnRyb2xzUmVzcG9uc2UiABJiChFMaW5rVW5tYXRjaGVkVGFzaxIlLnNlY3VyaXR5LnYxLkxpbmtVbm1hdGNoZWRUYXNrUmVxdWVzdBomLnNlY3VyaXR5LnYxLkxpbmtVbm1hdGNoZWRUYXNrUmVzcG9uc2VCTFpKZ2l0aHViLmNvbS9hc3VrYS1zYWthbW90by9zZWN1cml0eS1zeXN0ZW0vZ2VuL3Byb3RvL3NlY3VyaXR5L3YxO3NlY3VyaXR5djFiBnByb3RvMw", [file_google_protobuf_timestamp]);
 
 /**
  * Control本体のデータ構造
@@ -655,6 +655,130 @@ export const GetDashboardStatsResponseSchema: GenMessage<GetDashboardStatsRespon
   messageDesc(file_proto_security_v1_service, 23);
 
 /**
+ * @generated from message security.v1.BulkCreateControlItem
+ */
+export type BulkCreateControlItem = Message<"security.v1.BulkCreateControlItem"> & {
+  /**
+   * @generated from field: string title = 1;
+   */
+  title: string;
+
+  /**
+   * @generated from field: string category = 2;
+   */
+  category: string;
+
+  /**
+   * @generated from field: string question = 3;
+   */
+  question: string;
+
+  /**
+   * @generated from field: string answer = 4;
+   */
+  answer: string;
+
+  /**
+   * @generated from field: repeated string tags = 5;
+   */
+  tags: string[];
+};
+
+/**
+ * Describes the message security.v1.BulkCreateControlItem.
+ * Use `create(BulkCreateControlItemSchema)` to create a new message.
+ */
+export const BulkCreateControlItemSchema: GenMessage<BulkCreateControlItem> = /*@__PURE__*/
+  messageDesc(file_proto_security_v1_service, 24);
+
+/**
+ * @generated from message security.v1.BulkCreateControlsRequest
+ */
+export type BulkCreateControlsRequest = Message<"security.v1.BulkCreateControlsRequest"> & {
+  /**
+   * @generated from field: repeated security.v1.BulkCreateControlItem items = 1;
+   */
+  items: BulkCreateControlItem[];
+};
+
+/**
+ * Describes the message security.v1.BulkCreateControlsRequest.
+ * Use `create(BulkCreateControlsRequestSchema)` to create a new message.
+ */
+export const BulkCreateControlsRequestSchema: GenMessage<BulkCreateControlsRequest> = /*@__PURE__*/
+  messageDesc(file_proto_security_v1_service, 25);
+
+/**
+ * @generated from message security.v1.BulkCreateControlsResponse
+ */
+export type BulkCreateControlsResponse = Message<"security.v1.BulkCreateControlsResponse"> & {
+  /**
+   * @generated from field: int32 success_count = 1;
+   */
+  successCount: number;
+
+  /**
+   * @generated from field: int32 error_count = 2;
+   */
+  errorCount: number;
+
+  /**
+   * @generated from field: repeated string error_messages = 3;
+   */
+  errorMessages: string[];
+};
+
+/**
+ * Describes the message security.v1.BulkCreateControlsResponse.
+ * Use `create(BulkCreateControlsResponseSchema)` to create a new message.
+ */
+export const BulkCreateControlsResponseSchema: GenMessage<BulkCreateControlsResponse> = /*@__PURE__*/
+  messageDesc(file_proto_security_v1_service, 26);
+
+/**
+ * @generated from message security.v1.LinkUnmatchedTaskRequest
+ */
+export type LinkUnmatchedTaskRequest = Message<"security.v1.LinkUnmatchedTaskRequest"> & {
+  /**
+   * 解決したい未マッチタスクのID
+   *
+   * @generated from field: string unmatched_task_id = 1;
+   */
+  unmatchedTaskId: string;
+
+  /**
+   * 紐付け先の既存ControlのID
+   *
+   * @generated from field: string control_id = 2;
+   */
+  controlId: string;
+};
+
+/**
+ * Describes the message security.v1.LinkUnmatchedTaskRequest.
+ * Use `create(LinkUnmatchedTaskRequestSchema)` to create a new message.
+ */
+export const LinkUnmatchedTaskRequestSchema: GenMessage<LinkUnmatchedTaskRequest> = /*@__PURE__*/
+  messageDesc(file_proto_security_v1_service, 27);
+
+/**
+ * @generated from message security.v1.LinkUnmatchedTaskResponse
+ */
+export type LinkUnmatchedTaskResponse = Message<"security.v1.LinkUnmatchedTaskResponse"> & {
+  /**
+   * @generated from field: bool success = 1;
+   */
+  success: boolean;
+};
+
+/**
+ * Describes the message security.v1.LinkUnmatchedTaskResponse.
+ * Use `create(LinkUnmatchedTaskResponseSchema)` to create a new message.
+ */
+export const LinkUnmatchedTaskResponseSchema: GenMessage<LinkUnmatchedTaskResponse> = /*@__PURE__*/
+  messageDesc(file_proto_security_v1_service, 28);
+
+/**
  * ---------------------------------------------------------
  * サービス定義（APIエンドポイント）
  * ---------------------------------------------------------
@@ -751,6 +875,24 @@ export const SecurityService: GenService<{
     methodKind: "unary";
     input: typeof ListFeedEventsRequestSchema;
     output: typeof ListFeedEventsResponseSchema;
+  },
+  /**
+   * @generated from rpc security.v1.SecurityService.BulkCreateControls
+   */
+  bulkCreateControls: {
+    methodKind: "unary";
+    input: typeof BulkCreateControlsRequestSchema;
+    output: typeof BulkCreateControlsResponseSchema;
+  },
+  /**
+   * --- 以下を追記 ---
+   *
+   * @generated from rpc security.v1.SecurityService.LinkUnmatchedTask
+   */
+  linkUnmatchedTask: {
+    methodKind: "unary";
+    input: typeof LinkUnmatchedTaskRequestSchema;
+    output: typeof LinkUnmatchedTaskResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_proto_security_v1_service, 0);

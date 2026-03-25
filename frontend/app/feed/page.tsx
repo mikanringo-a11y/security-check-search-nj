@@ -54,7 +54,7 @@ export default function FeedPage() {
                       {event.controlTitle || '対象のControl'}
                     </Link>
                     を
-                    {event.eventType === 'update' ? '更新' : event.eventType === 'create' ? '作成' : '紐付け'}しました
+                  {event.eventType.toLowerCase().includes('update') ? '更新' : event.eventType.toLowerCase().includes('create') ? '作成' : '紐付け'}しました
                   </h3>
                   
                   {/* Timestampの変換を適用 */}

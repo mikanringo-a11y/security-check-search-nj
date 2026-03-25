@@ -10,6 +10,12 @@ COPY go.work go.work.sum ./
 COPY backend/go.mod backend/go.sum ./backend/
 COPY gen/go.mod gen/go.sum ./gen/
 
+#キャッシュマウント
+RUN --mount=type=cache,target=/go/pkg/mod \
+    cd backend && go mod download
+RUN --mount=type=cache,target=/go/pkg/mod \
+    cd gen && go mod download
+
 # 依存パッケージのダウンロード
 RUN cd backend && go mod download
 RUN cd gen && go mod download
@@ -17,6 +23,11 @@ RUN cd gen && go mod download
 # ソースコード全体をコピー
 COPY backend/ ./backend/
 COPY gen/ ./gen/
+
+#モジュールキャッシュを再利用して、コード生成とビルドを行う
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    cd backend && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /server ./cmd/server/main.go
 
 # 完全な静的バイナリとしてビルド（CGO_ENABLED=0 が Distroless で動かすための鍵）
 WORKDIR /app/backend

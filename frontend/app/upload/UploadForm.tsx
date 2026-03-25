@@ -4,7 +4,11 @@ import { uploadFile } from "./UploadFile";
 import toast from "react-hot-toast"; // ★ 追加
 import { useRef } from "react";
 
-export function UploadForm(){
+interface UploadFormProps {
+  onUploadSuccess?: () => void;
+}
+
+export function UploadForm({ onUploadSuccess }: UploadFormProps){
     // フォームをリセットするための参照
     const formRef = useRef<HTMLFormElement>(null);
 
@@ -30,6 +34,11 @@ export function UploadForm(){
             
             // フォームの選択状態をクリア
             formRef.current?.reset();
+            
+            // アップロード成功時のコールバックを呼び出す
+            if (onUploadSuccess) {
+                onUploadSuccess();
+            }
         } catch (error) {
             console.error(error);
             // 失敗したらトーストを赤のバツに切り替え

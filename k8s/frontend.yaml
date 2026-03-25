@@ -24,7 +24,7 @@ spec:
       serviceAccountName: frontend-ksa
       containers:
       - name: frontend
-        image: asia-northeast1-docker.pkg.dev/welcome-study-sakamoto/security-check-repo/frontend:v2
+        image: asia-northeast1-docker.pkg.dev/welcome-study-sakamoto/security-check-repo/frontend:v22
         imagePullPolicy: Always
         resources:
           requests:
@@ -40,7 +40,7 @@ spec:
         - name: API_URL
           value: "http://backend:8080"
         - name: NEXT_PUBLIC_API_URL
-          value: "http://35.243.83.111"
+          value: "https://anywhere-wwd.com"
         - name: GCP_BUCKET_NAME
           value: "welcome-study-sakamoto-bucket"
         # NextAuth 設定

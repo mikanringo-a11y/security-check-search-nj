@@ -4,6 +4,8 @@ import toast from 'react-hot-toast';
 import { createClient } from "@connectrpc/connect";
 import { createConnectTransport } from "@connectrpc/connect-web";
 import { SecurityService } from "../gen/proto/security/v1/service_pb";
+import { useSession } from "next-auth/react";
+import { securityClient } from '../lib/api';
 
 type CreateControlForm = {
   title: string;
@@ -16,6 +18,7 @@ type CreateControlForm = {
 export const useCreateControl = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { data: session } = useSession();
 
   const [form, setForm] = useState<CreateControlForm>({
     title: '',
@@ -50,6 +53,7 @@ export const useCreateControl = () => {
   };
 
   // 保存処理
+  
   const handleSave = async () => {
     if (!validate()) return;
 
@@ -60,14 +64,8 @@ export const useCreateControl = () => {
       .filter((tag) => tag !== '');
 
     try {
-      // Connect RPC クライアントの初期化
-      const transport = createConnectTransport({
-        baseUrl: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080",
-      });
-      const client = createClient(SecurityService, transport);
-
-      // 直接バックエンドの createControl を呼び出す
-      await client.createControl({
+      // 共通クライアントを呼び出すだけ（ヘッダー処理は裏側で自動化）
+      await securityClient.createControl({
         title: form.title,
         category: form.category,
         tags: tagsArray,

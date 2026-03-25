@@ -29,6 +29,11 @@ service SecurityService {
 
   // 4. 活動履歴（feed）API
   rpc ListFeedEvents (ListFeedEventsRequest) returns (ListFeedEventsResponse) {}
+  rpc BulkCreateControls (BulkCreateControlsRequest) returns (BulkCreateControlsResponse) {}
+  
+  
+  // --- 以下を追記 ---
+  rpc LinkUnmatchedTask(LinkUnmatchedTaskRequest) returns (LinkUnmatchedTaskResponse);
 }
 
 // ---------------------------------------------------------
@@ -162,4 +167,29 @@ message GetDashboardStatsResponse {
   int32 pending_unmatched = 2;   // 未マッチ質問の残り件数
   // 必要に応じて「今週の更新数」などを追加することも可能です
   int32 team_updates = 3;
+}
+message BulkCreateControlItem {
+  string title = 1;
+  string category = 2;
+  string question = 3;
+  string answer = 4;
+  repeated string tags = 5;
+}
+
+message BulkCreateControlsRequest {
+  repeated BulkCreateControlItem items = 1;
+}
+
+message BulkCreateControlsResponse {
+  int32 success_count = 1;
+  int32 error_count = 2;
+  repeated string error_messages = 3;
+}
+message LinkUnmatchedTaskRequest {
+  string unmatched_task_id = 1; // 解決したい未マッチタスクのID
+  string control_id = 2;        // 紐付け先の既存ControlのID
+}
+
+message LinkUnmatchedTaskResponse {
+  bool success = 1;
 }
