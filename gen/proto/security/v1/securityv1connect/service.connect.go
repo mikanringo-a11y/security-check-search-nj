@@ -65,6 +65,9 @@ const (
 	// SecurityServiceBulkCreateControlsProcedure is the fully-qualified name of the SecurityService's
 	// BulkCreateControls RPC.
 	SecurityServiceBulkCreateControlsProcedure = "/security.v1.SecurityService/BulkCreateControls"
+	// SecurityServiceLinkUnmatchedTaskProcedure is the fully-qualified name of the SecurityService's
+	// LinkUnmatchedTask RPC.
+	SecurityServiceLinkUnmatchedTaskProcedure = "/security.v1.SecurityService/LinkUnmatchedTask"
 )
 
 // SecurityServiceClient is a client for the security.v1.SecurityService service.
@@ -85,6 +88,8 @@ type SecurityServiceClient interface {
 	// 4. 活動履歴（feed）API
 	ListFeedEvents(context.Context, *connect.Request[v1.ListFeedEventsRequest]) (*connect.Response[v1.ListFeedEventsResponse], error)
 	BulkCreateControls(context.Context, *connect.Request[v1.BulkCreateControlsRequest]) (*connect.Response[v1.BulkCreateControlsResponse], error)
+	// --- 以下を追記 ---
+	LinkUnmatchedTask(context.Context, *connect.Request[v1.LinkUnmatchedTaskRequest]) (*connect.Response[v1.LinkUnmatchedTaskResponse], error)
 }
 
 // NewSecurityServiceClient constructs a client for the security.v1.SecurityService service. By
@@ -164,6 +169,12 @@ func NewSecurityServiceClient(httpClient connect.HTTPClient, baseURL string, opt
 			connect.WithSchema(securityServiceMethods.ByName("BulkCreateControls")),
 			connect.WithClientOptions(opts...),
 		),
+		linkUnmatchedTask: connect.NewClient[v1.LinkUnmatchedTaskRequest, v1.LinkUnmatchedTaskResponse](
+			httpClient,
+			baseURL+SecurityServiceLinkUnmatchedTaskProcedure,
+			connect.WithSchema(securityServiceMethods.ByName("LinkUnmatchedTask")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -180,6 +191,7 @@ type securityServiceClient struct {
 	listUnmatchedTasks *connect.Client[v1.ListUnmatchedTasksRequest, v1.ListUnmatchedTasksResponse]
 	listFeedEvents     *connect.Client[v1.ListFeedEventsRequest, v1.ListFeedEventsResponse]
 	bulkCreateControls *connect.Client[v1.BulkCreateControlsRequest, v1.BulkCreateControlsResponse]
+	linkUnmatchedTask  *connect.Client[v1.LinkUnmatchedTaskRequest, v1.LinkUnmatchedTaskResponse]
 }
 
 // Ping calls security.v1.SecurityService.Ping.
@@ -237,6 +249,11 @@ func (c *securityServiceClient) BulkCreateControls(ctx context.Context, req *con
 	return c.bulkCreateControls.CallUnary(ctx, req)
 }
 
+// LinkUnmatchedTask calls security.v1.SecurityService.LinkUnmatchedTask.
+func (c *securityServiceClient) LinkUnmatchedTask(ctx context.Context, req *connect.Request[v1.LinkUnmatchedTaskRequest]) (*connect.Response[v1.LinkUnmatchedTaskResponse], error) {
+	return c.linkUnmatchedTask.CallUnary(ctx, req)
+}
+
 // SecurityServiceHandler is an implementation of the security.v1.SecurityService service.
 type SecurityServiceHandler interface {
 	// 疎通確認用
@@ -255,6 +272,8 @@ type SecurityServiceHandler interface {
 	// 4. 活動履歴（feed）API
 	ListFeedEvents(context.Context, *connect.Request[v1.ListFeedEventsRequest]) (*connect.Response[v1.ListFeedEventsResponse], error)
 	BulkCreateControls(context.Context, *connect.Request[v1.BulkCreateControlsRequest]) (*connect.Response[v1.BulkCreateControlsResponse], error)
+	// --- 以下を追記 ---
+	LinkUnmatchedTask(context.Context, *connect.Request[v1.LinkUnmatchedTaskRequest]) (*connect.Response[v1.LinkUnmatchedTaskResponse], error)
 }
 
 // NewSecurityServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -330,6 +349,12 @@ func NewSecurityServiceHandler(svc SecurityServiceHandler, opts ...connect.Handl
 		connect.WithSchema(securityServiceMethods.ByName("BulkCreateControls")),
 		connect.WithHandlerOptions(opts...),
 	)
+	securityServiceLinkUnmatchedTaskHandler := connect.NewUnaryHandler(
+		SecurityServiceLinkUnmatchedTaskProcedure,
+		svc.LinkUnmatchedTask,
+		connect.WithSchema(securityServiceMethods.ByName("LinkUnmatchedTask")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/security.v1.SecurityService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case SecurityServicePingProcedure:
@@ -354,6 +379,8 @@ func NewSecurityServiceHandler(svc SecurityServiceHandler, opts ...connect.Handl
 			securityServiceListFeedEventsHandler.ServeHTTP(w, r)
 		case SecurityServiceBulkCreateControlsProcedure:
 			securityServiceBulkCreateControlsHandler.ServeHTTP(w, r)
+		case SecurityServiceLinkUnmatchedTaskProcedure:
+			securityServiceLinkUnmatchedTaskHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -405,4 +432,8 @@ func (UnimplementedSecurityServiceHandler) ListFeedEvents(context.Context, *conn
 
 func (UnimplementedSecurityServiceHandler) BulkCreateControls(context.Context, *connect.Request[v1.BulkCreateControlsRequest]) (*connect.Response[v1.BulkCreateControlsResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("security.v1.SecurityService.BulkCreateControls is not implemented"))
+}
+
+func (UnimplementedSecurityServiceHandler) LinkUnmatchedTask(context.Context, *connect.Request[v1.LinkUnmatchedTaskRequest]) (*connect.Response[v1.LinkUnmatchedTaskResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("security.v1.SecurityService.LinkUnmatchedTask is not implemented"))
 }

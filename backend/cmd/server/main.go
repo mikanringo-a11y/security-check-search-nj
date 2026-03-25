@@ -105,6 +105,10 @@ func (s *SecurityServer) GetControl(
 }
 
 func (s *SecurityServer) CreateControl(ctx context.Context, req *connect.Request[securityv1.CreateControlRequest]) (*connect.Response[securityv1.CreateControlResponse], error) {
+	userEmail := req.Header().Get("X-User-Email")
+	if userEmail == "" {
+		userEmail = "unknown"
+	}
 	newID := uuid.New().String()
 
 	tx, err := s.pool.Begin(ctx)
@@ -130,7 +134,7 @@ func (s *SecurityServer) CreateControl(ctx context.Context, req *connect.Request
 		Status:    db.NullControlStatus{ControlStatus: db.ControlStatusActive, Valid: true},
 		Version:   1,
 		Tags:      tags, // ここを nil チェック済みの tags に変更
-		UpdatedBy: "userEmail",
+		UpdatedBy: userEmail,
 	})
 	if err != nil {
 
@@ -194,7 +198,7 @@ func (s *SecurityServer) UpdateControl(
 ) (*connect.Response[securityv1.UpdateControlResponse], error) {
 	userEmail := req.Header().Get("X-User-Email")
 	if userEmail == "" {
-		userEmail = "system" // ヘッダーが無い場合の予備
+		userEmail = "unknown" // ヘッダーが無い場合の予備
 	}
 	tx, err := s.pool.Begin(ctx)
 	if err != nil {
@@ -836,4 +840,69 @@ func main() {
 	if err := http.ListenAndServe(addr, c.Handler(h2c.NewHandler(mux, &http2.Server{}))); err != nil {
 		fmt.Printf("Failed to start server: %v\n", err)
 	}
+}
+func (s *SecurityServer) LinkUnmatchedTask(
+	ctx context.Context,
+	req *connect.Request[securityv1.LinkUnmatchedTaskRequest],
+) (*connect.Response[securityv1.LinkUnmatchedTaskResponse], error) {
+
+	// 1. ヘッダーから実行ユーザーのメールアドレスを取得
+	userEmail := req.Header().Get("X-User-Email")
+	if userEmail == "" {
+		userEmail = "unknown"
+	}
+
+	// 2. タスクIDを文字列から数値に変換
+	taskIDInt, err := strconv.Atoi(req.Msg.UnmatchedTaskId)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("invalid task id format"))
+	}
+
+	// 3. データベースのトランザクション開始
+	tx, err := s.pool.Begin(ctx)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to begin tx: %w", err))
+	}
+	defer tx.Rollback(ctx)
+	qtx := s.queries.WithTx(tx)
+
+	// 4. 未マッチタスクのステータスを「解決済み (resolved)」に更新
+	err = qtx.UpdateUnmatchedTaskStatus(ctx, db.UpdateUnmatchedTaskStatusParams{
+		ID: int32(taskIDInt),
+		Status: db.NullUnmatchedStatus{
+			UnmatchedStatus: db.UnmatchedStatus("resolved"),
+			Valid:           true,
+		},
+	})
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to update task status: %w", err))
+	}
+
+	// 5. 紐付け先のControl情報を取得（履歴に残すため）
+	control, err := qtx.GetControl(ctx, req.Msg.ControlId)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("control not found: %w", err))
+	}
+
+	// 6. タイムライン（FeedEvent）に「〇〇さんが紐付けました」という履歴を残す
+	// ※ db.FeedEventType の定義に合わせて "linked" または "update" 等を設定してください
+	description := "未マッチの質問をこのControlに紐付けました"
+	_, err = qtx.CreateFeedEvent(ctx, db.CreateFeedEventParams{
+		EventType:   db.FeedEventTypeUpdated, // 既存のEnumに合わせて調整
+		ControlID:   pgtype.Text{String: control.ID, Valid: true},
+		UserName:    userEmail,
+		Description: pgtype.Text{String: description, Valid: true},
+	})
+	if err != nil {
+		log.Printf("Warning: Failed to create feed event: %v", err)
+	}
+
+	// 7. トランザクションをコミット（確定）
+	if err := tx.Commit(ctx); err != nil {
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to commit tx: %w", err))
+	}
+
+	return connect.NewResponse(&securityv1.LinkUnmatchedTaskResponse{
+		Success: true,
+	}), nil
 }

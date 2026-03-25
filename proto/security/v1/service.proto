@@ -30,6 +30,10 @@ service SecurityService {
   // 4. 活動履歴（feed）API
   rpc ListFeedEvents (ListFeedEventsRequest) returns (ListFeedEventsResponse) {}
   rpc BulkCreateControls (BulkCreateControlsRequest) returns (BulkCreateControlsResponse) {}
+  
+  
+  // --- 以下を追記 ---
+  rpc LinkUnmatchedTask(LinkUnmatchedTaskRequest) returns (LinkUnmatchedTaskResponse);
 }
 
 // ---------------------------------------------------------
@@ -180,4 +184,12 @@ message BulkCreateControlsResponse {
   int32 success_count = 1;
   int32 error_count = 2;
   repeated string error_messages = 3;
+}
+message LinkUnmatchedTaskRequest {
+  string unmatched_task_id = 1; // 解決したい未マッチタスクのID
+  string control_id = 2;        // 紐付け先の既存ControlのID
+}
+
+message LinkUnmatchedTaskResponse {
+  bool success = 1;
 }

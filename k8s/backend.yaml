@@ -38,7 +38,7 @@ spec:
       
       containers:
         - name: backend
-          image: asia-northeast1-docker.pkg.dev/welcome-study-sakamoto/security-check-repo/backend:v15
+          image: asia-northeast1-docker.pkg.dev/welcome-study-sakamoto/security-check-repo/backend:v20
           volumeMounts:
             - name: bleve-index-volume
               mountPath: /tmp/bleve-data

@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { BulkCreateControlsRequest, BulkCreateControlsResponse, CreateControlRequest, CreateControlResponse, DeleteControlRequest, DeleteControlResponse, GetControlRequest, GetControlResponse, GetDashboardStatsRequest, GetDashboardStatsResponse, ListControlsRequest, ListControlsResponse, ListFeedEventsRequest, ListFeedEventsResponse, ListUnmatchedTasksRequest, ListUnmatchedTasksResponse, PingRequest, PingResponse, SearchControlsRequest, SearchControlsResponse, UpdateControlRequest, UpdateControlResponse } from "./service_pb.js";
+import { BulkCreateControlsRequest, BulkCreateControlsResponse, CreateControlRequest, CreateControlResponse, DeleteControlRequest, DeleteControlResponse, GetControlRequest, GetControlResponse, GetDashboardStatsRequest, GetDashboardStatsResponse, LinkUnmatchedTaskRequest, LinkUnmatchedTaskResponse, ListControlsRequest, ListControlsResponse, ListFeedEventsRequest, ListFeedEventsResponse, ListUnmatchedTasksRequest, ListUnmatchedTasksResponse, PingRequest, PingResponse, SearchControlsRequest, SearchControlsResponse, UpdateControlRequest, UpdateControlResponse } from "./service_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -123,6 +123,17 @@ export const SecurityService = {
       name: "BulkCreateControls",
       I: BulkCreateControlsRequest,
       O: BulkCreateControlsResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * --- 以下を追記 ---
+     *
+     * @generated from rpc security.v1.SecurityService.LinkUnmatchedTask
+     */
+    linkUnmatchedTask: {
+      name: "LinkUnmatchedTask",
+      I: LinkUnmatchedTaskRequest,
+      O: LinkUnmatchedTaskResponse,
       kind: MethodKind.Unary,
     },
   }

@@ -24,7 +24,7 @@ spec:
       serviceAccountName: frontend-ksa
       containers:
       - name: frontend
-        image: asia-northeast1-docker.pkg.dev/welcome-study-sakamoto/security-check-repo/frontend:v5
+        image: asia-northeast1-docker.pkg.dev/welcome-study-sakamoto/security-check-repo/frontend:v22
         imagePullPolicy: Always
         resources:
           requests:

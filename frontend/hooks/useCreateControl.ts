@@ -5,6 +5,7 @@ import { createClient } from "@connectrpc/connect";
 import { createConnectTransport } from "@connectrpc/connect-web";
 import { SecurityService } from "../gen/proto/security/v1/service_pb";
 import { useSession } from "next-auth/react";
+import { securityClient } from '../lib/api';
 
 type CreateControlForm = {
   title: string;
@@ -52,6 +53,7 @@ export const useCreateControl = () => {
   };
 
   // 保存処理
+  
   const handleSave = async () => {
     if (!validate()) return;
 
@@ -60,35 +62,18 @@ export const useCreateControl = () => {
       .split(',')
       .map((tag) => tag.trim())
       .filter((tag) => tag !== '');
-      
-    // メアドを取得（取得できなければ 'unknown' にする）
-    const userEmail = session?.user?.email || "unknown";
 
     try {
-      // Connect RPC クライアントの初期化
-      const transport = createConnectTransport({
-        baseUrl: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080",
+      // 共通クライアントを呼び出すだけ（ヘッダー処理は裏側で自動化）
+      await securityClient.createControl({
+        title: form.title,
+        category: form.category,
+        tags: tagsArray,
+        question: form.question,
+        answer: form.answer,
+        // Protocol Buffersのstring型はnullを許容しないことが多いので、空文字を渡します
+        unmatchedTaskId: taskId || "", 
       });
-      const client = createClient(SecurityService, transport);
-
-      // 直接バックエンドの createControl を呼び出す
-      await client.createControl(
-        {
-          title: form.title,
-          category: form.category,
-          tags: tagsArray,
-          question: form.question,
-          answer: form.answer,
-          // Protocol Buffersのstring型はnullを許容しないことが多いので、空文字を渡します
-          unmatchedTaskId: taskId || "", 
-        },
-        // 👇 第2引数でヘッダー（メールアドレス）を渡す
-        {
-          headers: {
-            "X-User-Email": userEmail,
-          },
-        }
-      );
 
       toast.success('新しいControlを作成しました！');
       router.push('/controls');

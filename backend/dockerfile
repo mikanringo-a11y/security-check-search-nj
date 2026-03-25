@@ -27,7 +27,7 @@ COPY gen/ ./gen/
 #モジュールキャッシュを再利用して、コード生成とビルドを行う
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
-    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /server ./cmd/server/main.go
+    cd backend && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /server ./cmd/server/main.go
 
 # 完全な静的バイナリとしてビルド（CGO_ENABLED=0 が Distroless で動かすための鍵）
 WORKDIR /app/backend

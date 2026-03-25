@@ -1578,6 +1578,102 @@ func (x *BulkCreateControlsResponse) GetErrorMessages() []string {
 	return nil
 }
 
+type LinkUnmatchedTaskRequest struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	UnmatchedTaskId string                 `protobuf:"bytes,1,opt,name=unmatched_task_id,json=unmatchedTaskId,proto3" json:"unmatched_task_id,omitempty"` // 解決したい未マッチタスクのID
+	ControlId       string                 `protobuf:"bytes,2,opt,name=control_id,json=controlId,proto3" json:"control_id,omitempty"`                     // 紐付け先の既存ControlのID
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *LinkUnmatchedTaskRequest) Reset() {
+	*x = LinkUnmatchedTaskRequest{}
+	mi := &file_proto_security_v1_service_proto_msgTypes[27]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LinkUnmatchedTaskRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LinkUnmatchedTaskRequest) ProtoMessage() {}
+
+func (x *LinkUnmatchedTaskRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_security_v1_service_proto_msgTypes[27]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LinkUnmatchedTaskRequest.ProtoReflect.Descriptor instead.
+func (*LinkUnmatchedTaskRequest) Descriptor() ([]byte, []int) {
+	return file_proto_security_v1_service_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *LinkUnmatchedTaskRequest) GetUnmatchedTaskId() string {
+	if x != nil {
+		return x.UnmatchedTaskId
+	}
+	return ""
+}
+
+func (x *LinkUnmatchedTaskRequest) GetControlId() string {
+	if x != nil {
+		return x.ControlId
+	}
+	return ""
+}
+
+type LinkUnmatchedTaskResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LinkUnmatchedTaskResponse) Reset() {
+	*x = LinkUnmatchedTaskResponse{}
+	mi := &file_proto_security_v1_service_proto_msgTypes[28]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LinkUnmatchedTaskResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LinkUnmatchedTaskResponse) ProtoMessage() {}
+
+func (x *LinkUnmatchedTaskResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_security_v1_service_proto_msgTypes[28]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LinkUnmatchedTaskResponse.ProtoReflect.Descriptor instead.
+func (*LinkUnmatchedTaskResponse) Descriptor() ([]byte, []int) {
+	return file_proto_security_v1_service_proto_rawDescGZIP(), []int{28}
+}
+
+func (x *LinkUnmatchedTaskResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
 var File_proto_security_v1_service_proto protoreflect.FileDescriptor
 
 const file_proto_security_v1_service_proto_rawDesc = "" +
@@ -1697,7 +1793,13 @@ const file_proto_security_v1_service_proto_rawDesc = "" +
 	"\rsuccess_count\x18\x01 \x01(\x05R\fsuccessCount\x12\x1f\n" +
 	"\verror_count\x18\x02 \x01(\x05R\n" +
 	"errorCount\x12%\n" +
-	"\x0eerror_messages\x18\x03 \x03(\tR\rerrorMessages2\xf6\a\n" +
+	"\x0eerror_messages\x18\x03 \x03(\tR\rerrorMessages\"e\n" +
+	"\x18LinkUnmatchedTaskRequest\x12*\n" +
+	"\x11unmatched_task_id\x18\x01 \x01(\tR\x0funmatchedTaskId\x12\x1d\n" +
+	"\n" +
+	"control_id\x18\x02 \x01(\tR\tcontrolId\"5\n" +
+	"\x19LinkUnmatchedTaskResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess2\xda\b\n" +
 	"\x0fSecurityService\x12=\n" +
 	"\x04Ping\x12\x18.security.v1.PingRequest\x1a\x19.security.v1.PingResponse\"\x00\x12U\n" +
 	"\fListControls\x12 .security.v1.ListControlsRequest\x1a!.security.v1.ListControlsResponse\"\x00\x12O\n" +
@@ -1710,7 +1812,8 @@ const file_proto_security_v1_service_proto_rawDesc = "" +
 	"\x0eSearchControls\x12\".security.v1.SearchControlsRequest\x1a#.security.v1.SearchControlsResponse\"\x00\x12g\n" +
 	"\x12ListUnmatchedTasks\x12&.security.v1.ListUnmatchedTasksRequest\x1a'.security.v1.ListUnmatchedTasksResponse\"\x00\x12[\n" +
 	"\x0eListFeedEvents\x12\".security.v1.ListFeedEventsRequest\x1a#.security.v1.ListFeedEventsResponse\"\x00\x12g\n" +
-	"\x12BulkCreateControls\x12&.security.v1.BulkCreateControlsRequest\x1a'.security.v1.BulkCreateControlsResponse\"\x00BLZJgithub.com/asuka-sakamoto/security-system/gen/proto/security/v1;securityv1b\x06proto3"
+	"\x12BulkCreateControls\x12&.security.v1.BulkCreateControlsRequest\x1a'.security.v1.BulkCreateControlsResponse\"\x00\x12b\n" +
+	"\x11LinkUnmatchedTask\x12%.security.v1.LinkUnmatchedTaskRequest\x1a&.security.v1.LinkUnmatchedTaskResponseBLZJgithub.com/asuka-sakamoto/security-system/gen/proto/security/v1;securityv1b\x06proto3"
 
 var (
 	file_proto_security_v1_service_proto_rawDescOnce sync.Once
@@ -1724,7 +1827,7 @@ func file_proto_security_v1_service_proto_rawDescGZIP() []byte {
 	return file_proto_security_v1_service_proto_rawDescData
 }
 
-var file_proto_security_v1_service_proto_msgTypes = make([]protoimpl.MessageInfo, 27)
+var file_proto_security_v1_service_proto_msgTypes = make([]protoimpl.MessageInfo, 29)
 var file_proto_security_v1_service_proto_goTypes = []any{
 	(*Control)(nil),                    // 0: security.v1.Control
 	(*ControlVersion)(nil),             // 1: security.v1.ControlVersion
@@ -1753,13 +1856,15 @@ var file_proto_security_v1_service_proto_goTypes = []any{
 	(*BulkCreateControlItem)(nil),      // 24: security.v1.BulkCreateControlItem
 	(*BulkCreateControlsRequest)(nil),  // 25: security.v1.BulkCreateControlsRequest
 	(*BulkCreateControlsResponse)(nil), // 26: security.v1.BulkCreateControlsResponse
-	(*timestamppb.Timestamp)(nil),      // 27: google.protobuf.Timestamp
+	(*LinkUnmatchedTaskRequest)(nil),   // 27: security.v1.LinkUnmatchedTaskRequest
+	(*LinkUnmatchedTaskResponse)(nil),  // 28: security.v1.LinkUnmatchedTaskResponse
+	(*timestamppb.Timestamp)(nil),      // 29: google.protobuf.Timestamp
 }
 var file_proto_security_v1_service_proto_depIdxs = []int32{
-	27, // 0: security.v1.Control.updated_at:type_name -> google.protobuf.Timestamp
-	27, // 1: security.v1.ControlVersion.changed_at:type_name -> google.protobuf.Timestamp
-	27, // 2: security.v1.UnmatchedTask.created_at:type_name -> google.protobuf.Timestamp
-	27, // 3: security.v1.FeedEvent.created_at:type_name -> google.protobuf.Timestamp
+	29, // 0: security.v1.Control.updated_at:type_name -> google.protobuf.Timestamp
+	29, // 1: security.v1.ControlVersion.changed_at:type_name -> google.protobuf.Timestamp
+	29, // 2: security.v1.UnmatchedTask.created_at:type_name -> google.protobuf.Timestamp
+	29, // 3: security.v1.FeedEvent.created_at:type_name -> google.protobuf.Timestamp
 	0,  // 4: security.v1.ListControlsResponse.controls:type_name -> security.v1.Control
 	0,  // 5: security.v1.GetControlResponse.control:type_name -> security.v1.Control
 	1,  // 6: security.v1.GetControlResponse.history:type_name -> security.v1.ControlVersion
@@ -1780,19 +1885,21 @@ var file_proto_security_v1_service_proto_depIdxs = []int32{
 	16, // 21: security.v1.SecurityService.ListUnmatchedTasks:input_type -> security.v1.ListUnmatchedTasksRequest
 	18, // 22: security.v1.SecurityService.ListFeedEvents:input_type -> security.v1.ListFeedEventsRequest
 	25, // 23: security.v1.SecurityService.BulkCreateControls:input_type -> security.v1.BulkCreateControlsRequest
-	5,  // 24: security.v1.SecurityService.Ping:output_type -> security.v1.PingResponse
-	7,  // 25: security.v1.SecurityService.ListControls:output_type -> security.v1.ListControlsResponse
-	9,  // 26: security.v1.SecurityService.GetControl:output_type -> security.v1.GetControlResponse
-	11, // 27: security.v1.SecurityService.CreateControl:output_type -> security.v1.CreateControlResponse
-	15, // 28: security.v1.SecurityService.UpdateControl:output_type -> security.v1.UpdateControlResponse
-	21, // 29: security.v1.SecurityService.DeleteControl:output_type -> security.v1.DeleteControlResponse
-	23, // 30: security.v1.SecurityService.GetDashboardStats:output_type -> security.v1.GetDashboardStatsResponse
-	13, // 31: security.v1.SecurityService.SearchControls:output_type -> security.v1.SearchControlsResponse
-	17, // 32: security.v1.SecurityService.ListUnmatchedTasks:output_type -> security.v1.ListUnmatchedTasksResponse
-	19, // 33: security.v1.SecurityService.ListFeedEvents:output_type -> security.v1.ListFeedEventsResponse
-	26, // 34: security.v1.SecurityService.BulkCreateControls:output_type -> security.v1.BulkCreateControlsResponse
-	24, // [24:35] is the sub-list for method output_type
-	13, // [13:24] is the sub-list for method input_type
+	27, // 24: security.v1.SecurityService.LinkUnmatchedTask:input_type -> security.v1.LinkUnmatchedTaskRequest
+	5,  // 25: security.v1.SecurityService.Ping:output_type -> security.v1.PingResponse
+	7,  // 26: security.v1.SecurityService.ListControls:output_type -> security.v1.ListControlsResponse
+	9,  // 27: security.v1.SecurityService.GetControl:output_type -> security.v1.GetControlResponse
+	11, // 28: security.v1.SecurityService.CreateControl:output_type -> security.v1.CreateControlResponse
+	15, // 29: security.v1.SecurityService.UpdateControl:output_type -> security.v1.UpdateControlResponse
+	21, // 30: security.v1.SecurityService.DeleteControl:output_type -> security.v1.DeleteControlResponse
+	23, // 31: security.v1.SecurityService.GetDashboardStats:output_type -> security.v1.GetDashboardStatsResponse
+	13, // 32: security.v1.SecurityService.SearchControls:output_type -> security.v1.SearchControlsResponse
+	17, // 33: security.v1.SecurityService.ListUnmatchedTasks:output_type -> security.v1.ListUnmatchedTasksResponse
+	19, // 34: security.v1.SecurityService.ListFeedEvents:output_type -> security.v1.ListFeedEventsResponse
+	26, // 35: security.v1.SecurityService.BulkCreateControls:output_type -> security.v1.BulkCreateControlsResponse
+	28, // 36: security.v1.SecurityService.LinkUnmatchedTask:output_type -> security.v1.LinkUnmatchedTaskResponse
+	25, // [25:37] is the sub-list for method output_type
+	13, // [13:25] is the sub-list for method input_type
 	13, // [13:13] is the sub-list for extension type_name
 	13, // [13:13] is the sub-list for extension extendee
 	0,  // [0:13] is the sub-list for field type_name
@@ -1809,7 +1916,7 @@ func file_proto_security_v1_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_security_v1_service_proto_rawDesc), len(file_proto_security_v1_service_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   27,
+			NumMessages:   29,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
